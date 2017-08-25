@@ -11,151 +11,340 @@
 
 #include <boost/thread.hpp>
 #include <boost/chrono.hpp>
+#include <boost/asio.hpp>
+
+#include "args.hxx"
+#include "MJPGWriter.cpp"
 
 
-void showImage(cv::Mat& src){
+using namespace Pylon;
+using namespace GenApi;
+using namespace std;
+typedef Pylon::CBaslerGigEInstantCamera Camera_t;
+using namespace Basler_GigECameraParams;
 
-  cv::namedWindow("grabzbar", CV_WINDOW_AUTOSIZE );
-  cv::imshow("grabzbar", src );
-  cv::waitKey(1);
+bool showImageWindow = false;
+bool showDebug = false;
+bool barcodeClahe = false;
 
+int thres_start = 60;
+int thres_stop = 160;
+int thres_step = 20;
+
+MJPGWriter* mjpgWritter;
+
+
+bool is_digits(const std::string &str){
+    return std::all_of(str.begin(), str.end(), ::isdigit); // C++11
 }
 
-int camera(int grabExposure,int grabHeight, int imageHeight){
-    int nbBuffers=10;
-    int totalImageSize=0;
-    cv::Mat currentImage;
+void showImage(cv::Mat& src){
+  if (showImageWindow){
+    cv::namedWindow("grabzbar", CV_WINDOW_AUTOSIZE );
+    cv::imshow("grabzbar", src );
+    cv::waitKey(1);
+  }
+}
 
-    // Automagically call PylonInitialize and PylonTerminate to ensure the pylon runtime system
-    // is initialized during the lifetime of this object.
-    Pylon::PylonAutoInitTerm autoInitTerm;
-    try
-    {
-        // Create an instant camera object with the camera device found first.
-        //CInstantCamera camera( CTlFactory::GetInstance().CreateFirstDevice());
+void barcode(cv::Mat part,int count) {
 
-        // Only look for cameras supported by Camera_t
-        CDeviceInfo info;
-        info.SetDeviceClass( Camera_t::DeviceClass());
+  cv::Mat gray;
+  cv::Mat norm;
+  cv::Mat mask;
+  int type = cv::NORM_MINMAX;
+  int dtype = -1;
+  int min=0;
+  int max=255;
+  cv::Point point;
+  cv::Size ksize(5,5);
 
-        // Create an instant camera object with the first found camera device matching the specified device class.
-        Camera_t camera( CTlFactory::GetInstance().CreateFirstDevice( info));
+  int rel=0;
+  int tmp=0;
+  bool codeRetry=false;
+  if (showDebug){
+    //std::cout << "barcode_internal " << count << std::endl;
+  }
 
+  cv::Mat image_clahe;
+  if (barcodeClahe==true){
+    cv::Mat lab_image;
+    cv::cvtColor(part, lab_image, CV_BGR2Lab);
 
-        // Print the model name of the camera.
-        cout << "Using device " << camera.GetDeviceInfo().GetModelName() << endl;
+    // Extract the L channel
+    std::vector<cv::Mat> lab_planes(3);
+    cv::split(lab_image, lab_planes);  // now we have the L image in lab_planes[0]
 
-        INodeMap& nodemap = camera.GetNodeMap();
+    // apply the CLAHE algorithm to the L channel
+    cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE();
+    clahe->setClipLimit(4);
+    cv::Mat dst;
+    clahe->apply(lab_planes[0], dst);
 
-        // Open the camera for accessing the parameters.
-        camera.Open();
+    // Merge the the color planes back into an Lab image
+    dst.copyTo(lab_planes[0]);
+    cv::merge(lab_planes, lab_image);
 
-        // Get camera device information.
-        cout << "Camera Device Information" << endl
-             << "=========================" << endl;
-        cout << "Vendor           : "
-             << CStringPtr( nodemap.GetNode( "DeviceVendorName") )->GetValue() << endl;
-        cout << "Model            : "
-             << CStringPtr( nodemap.GetNode( "DeviceModelName") )->GetValue() << endl;
-        cout << "Firmware version : "
-             << CStringPtr( nodemap.GetNode( "DeviceFirmwareVersion") )->GetValue() << endl << endl;
-
-        // Camera settings.
-        cout << "Camera Device Settings" << endl
-             << "======================" << endl;
-
-
-        camera.ExposureAuto.SetValue(ExposureAuto_Off);
-        camera.ExposureTimeRaw.SetValue(grabExposure);
-        //camera.ExposureTime.GetMin()
-
-        CIntegerPtr width( nodemap.GetNode( "Width"));
-        CIntegerPtr height( nodemap.GetNode( "Height"));
-        height->SetValue(grabHeight);
+   // convert back to RGB
+   cv::cvtColor(lab_image, image_clahe, CV_Lab2BGR);
+  }else{
+    image_clahe=part.clone();
+  }
 
 
-        if(camera->PixelFormat.GetValue() == PixelFormat_Mono8){
-          totalImageSize = pCamera->Width.GetValue()*imageHeight;
-          currentImage = cv::Mat(imageHeight, camera->Width.GetValue(), CV_8UC1, Scalar(0));
+
+  // counting here down
+  for (int thres=thres_start;((thres<thres_stop)&&( codeRetry==false ));thres+=thres_step){
+    gray=image_clahe.clone();
+    cv::threshold(gray,gray,thres,255, CV_THRESH_BINARY );
+    cv::normalize(gray, norm, min, max, type, dtype, mask);
+    cv::GaussianBlur(norm, norm, ksize, 0);
+
+    zbar::ImageScanner scanner;
+    scanner.set_config(zbar::ZBAR_NONE, zbar::ZBAR_CFG_ENABLE, 1);
+
+    scanner.set_config(zbar::ZBAR_CODE128, zbar::ZBAR_CFG_ENABLE, 1);
+    scanner.set_config(zbar::ZBAR_CODE128, zbar::ZBAR_CFG_ADD_CHECK, 1);
+    scanner.set_config(zbar::ZBAR_CODE128, zbar::ZBAR_CFG_EMIT_CHECK, 0);
+
+    scanner.set_config(zbar::ZBAR_CODE39, zbar::ZBAR_CFG_ENABLE, 1);
+    scanner.set_config(zbar::ZBAR_CODE39, zbar::ZBAR_CFG_ADD_CHECK, 1);
+    scanner.set_config(zbar::ZBAR_CODE39, zbar::ZBAR_CFG_EMIT_CHECK, 0);
+
+    scanner.set_config(zbar::ZBAR_I25, zbar::ZBAR_CFG_ENABLE, 1);
+    scanner.set_config(zbar::ZBAR_I25, zbar::ZBAR_CFG_ADD_CHECK, 1);
+    scanner.set_config(zbar::ZBAR_I25, zbar::ZBAR_CFG_EMIT_CHECK, 0);
+
+
+    zbar::Image image(norm.cols, norm.rows, "Y800", (uchar *)norm.data, norm.cols * norm.rows);
+    scanner.scan(image);
+    for(zbar::Image::SymbolIterator symbol = image.symbol_begin(); symbol != image.symbol_end(); ++symbol) {
+      if (showDebug){
+        std::cout << "thres " << thres << " Code " << symbol->get_data().c_str() << " Type " << symbol->get_type_name().c_str() << std::endl;
+      }
+      std::string code = std::string(symbol->get_data().c_str());
+      std::string type = std::string(symbol->get_type_name().c_str());
+
+      if (
+        (
+          ( (type=="I2/5") && (is_digits(code)) ) ||
+          ( (type!="I2/5")  )
+        ) && (
+          code.substr(0,4) != "0000"
+        )
+      ){
+
+        if (showDebug){
+          std::cout << "Code Length: " << code.length()-1 << std::endl;
+        }
+        if (type=="I2/5"){
+          std::cout << type << ": " << code.substr(0,code.length()-1) << std::endl;
         }else{
-
+          std::cout << type << ": " << code << std::endl;
         }
 
-        // Access the PixelFormat enumeration type node.
-        CEnumerationPtr pixelFormat( nodemap.GetNode( "PixelFormat"));
-        // Remember the current pixel format.
-        String_t oldPixelFormat = pixelFormat->ToString();
-        cout << "Old PixelFormat  : " << oldPixelFormat << endl;
-
-        // Set the pixel format to Mono8 if available.
-        if ( IsAvailable( pixelFormat->GetEntryByName( "Mono8")))
-        {
-            pixelFormat->FromString( "Mono8");
-            cout << "New PixelFormat  : " << pixelFormat->ToString() << endl;
-        }
-
-        // Get the image buffer size
-        const size_t imageSize = (size_t)(camera.PayloadSize.GetValue());
+      }
 
 
-        // The parameter MaxNumBuffer can be used to control the count of buffers
-        // allocated for grabbing. The default value of this parameter is 10.
-        //camera.MaxNumBuffer = 10;
-        camera.MaxBufferSize.SetValue(imageSize);
 
-        // We won't queue more than nbBuffers image buffers at a time
-        camera.MaxNumBuffer.SetValue(nbBuffers);
-
-        // Start the grabbing of c_countOfImagesToGrab images.
-        // The camera device is parameterized with a default configuration which
-        // sets up free-running continuous acquisition.
-        camera.StartGrabbing();// c_countOfImagesToGrab);
-
-        // This smart pointer will receive the grab result data.
-        CGrabResultPtr ptrGrabResult;
-        int cthread=0;
-        // Camera.StopGrabbing() is called automatically by the RetrieveResult() method
-        // when c_countOfImagesToGrab images have been retrieved.
-        while ( camera.IsGrabbing()){
-            // Wait for an image and then retrieve it. A timeout of 5000 ms is used.
-            camera.RetrieveResult( 5000, ptrGrabResult, TimeoutHandling_ThrowException);
-
-            // Image grabbed successfully?
-            if (ptrGrabResult->GrabSucceeded()){
-                // Access the image data.
-                grabbedImageSize = ptrGrabResult->GetWidth()*ptrGrabResult->GetHeight();
-                std::memcpy( currentImage.ptr(), currentImage.ptr()+grabbedImageSize, totalImageSize-grabbedImageSize);
-                std::memcpy( currentImage.ptr()+totalImageSize-grabbedImageSize, ptrGrabResult->GetBuffer(), grabbedImageSize );
-
-            }else{
-                cout << "Error: " << ptrGrabResult->GetErrorCode() << " " << ptrGrabResult->GetErrorDescription() << endl;
-            }
-        }
-    }catch (GenICam::GenericException &e){
-      // Error handling.
-      cerr << "An exception occurred." << endl
-      << e.GetDescription() << endl
-      << e.what() << endl;
-      exitCode = 1;
+      }
+      image.set_data(NULL, 0);
+      scanner.recycle_image(image);
     }
+
+
+  }
+
+
+int capture(int grabExposure,int grabHeight, int imageHeight, int grabBinning, int grabGain){
+  int exitCode = 0;
+  int nbBuffers=10*2;
+  int totalImageSize=0;
+  int grabbedImageSize=0;
+  int count=0;
+  cv::Mat currentImage;
+
+  // Automagically call PylonInitialize and PylonTerminate to ensure the pylon runtime system
+  // is initialized during the lifetime of this object.
+  Pylon::PylonAutoInitTerm autoInitTerm;
+  try
+  {
+      // Create an instant camera object with the camera device found first.
+      //CInstantCamera camera( CTlFactory::GetInstance().CreateFirstDevice());
+
+      // Only look for cameras supported by Camera_t
+      CDeviceInfo info;
+      info.SetDeviceClass( Camera_t::DeviceClass());
+
+      // Create an instant camera object with the first found camera device matching the specified device class.
+      Camera_t camera( CTlFactory::GetInstance().CreateFirstDevice( info));
+
+
+      // Print the model name of the camera.
+      cout << "Using device " << camera.GetDeviceInfo().GetModelName() << endl;
+
+      INodeMap& nodemap = camera.GetNodeMap();
+
+      // Open the camera for accessing the parameters.
+      camera.Open();
+
+      // Get camera device information.
+      cout << "Camera Device Information" << endl
+           << "=========================" << endl;
+      cout << "Vendor           : "
+           << CStringPtr( nodemap.GetNode( "DeviceVendorName") )->GetValue() << endl;
+      cout << "Model            : "
+           << CStringPtr( nodemap.GetNode( "DeviceModelName") )->GetValue() << endl;
+      cout << "Firmware version : "
+           << CStringPtr( nodemap.GetNode( "DeviceFirmwareVersion") )->GetValue() << endl;
+      cout << "ExposureTimeRaw Min : "
+           << CIntegerPtr( nodemap.GetNode( "ExposureTimeRaw") )->GetMin() << endl;
+      cout << "ExposureTimeRaw Max : "
+           << CIntegerPtr( nodemap.GetNode( "ExposureTimeRaw") )->GetMax() << endl;
+      cout << "ExposureTimeBaseAbs Value : "
+           <<  nodemap.GetNode( "ExposureTimeBaseAbs")  << endl;
+
+           CIntegerPtr gainRaw(nodemap.GetNode("GainRaw"));
+
+    if(gainRaw.IsValid()) {
+
+     cout << "GainRaw Min : "
+          <<  gainRaw->GetMin()  << endl;
+     cout << "GainRaw Max : "
+          <<  gainRaw->GetMax()  << endl;
+     cout << "GainRaw Value : "
+          <<  gainRaw->GetValue()  << endl;
+
+    }
+
+            // Camera settings.
+      cout << "Camera Device Settings" << endl
+           << "======================" << endl;
+
+
+
+      camera.BinningHorizontal.SetValue(grabBinning);
+      //
+      camera.ExposureAuto.SetValue(ExposureAuto_Off);
+      camera.ExposureTimeRaw.SetValue(grabExposure);
+      //camera.ExposureTime.GetMin()
+
+      CIntegerPtr width( nodemap.GetNode( "Width"));
+      CIntegerPtr height( nodemap.GetNode( "Height"));
+      height->SetValue(grabHeight);
+
+
+      if(camera.PixelFormat.GetValue() == PixelFormat_Mono8){
+        totalImageSize = camera.Width.GetValue()*imageHeight;
+        currentImage = cv::Mat(imageHeight, camera.Width.GetValue(), CV_8UC1, cv::Scalar(0));
+      }else{
+
+      }
+
+      // Access the PixelFormat enumeration type node.
+      CEnumerationPtr pixelFormat( nodemap.GetNode( "PixelFormat"));
+      // Remember the current pixel format.
+      String_t oldPixelFormat = pixelFormat->ToString();
+      cout << "Old PixelFormat  : " << oldPixelFormat << endl;
+
+      // Set the pixel format to Mono8 if available.
+      if ( IsAvailable( pixelFormat->GetEntryByName( "Mono8")))
+      {
+          pixelFormat->FromString( "Mono8");
+          cout << "New PixelFormat  : " << pixelFormat->ToString() << endl;
+      }
+
+      // Get the image buffer size
+      const size_t imageSize = (size_t)(camera.PayloadSize.GetValue());
+
+
+      // The parameter MaxNumBuffer can be used to control the count of buffers
+      // allocated for grabbing. The default value of this parameter is 10.
+      camera.MaxNumBuffer = nbBuffers;
+      //camera.MaxBufferSize = imageSize;
+      //camera.MaxBufferSize.SetValue(imageSize);
+
+      // We won't queue more than nbBuffers image buffers at a time
+      //camera.MaxNumBuffer.SetValue(nbBuffers);
+
+      // Start the grabbing of c_countOfImagesToGrab images.
+      // The camera device is parameterized with a default configuration which
+      // sets up free-running continuous acquisition.
+      camera.StartGrabbing();// c_countOfImagesToGrab);
+
+      // This smart pointer will receive the grab result data.
+      CGrabResultPtr ptrGrabResult;
+      int cthread=0;
+      // Camera.StopGrabbing() is called automatically by the RetrieveResult() method
+      // when c_countOfImagesToGrab images have been retrieved.
+      while ( camera.IsGrabbing()){
+          // Wait for an image and then retrieve it. A timeout of 5000 ms is used.
+          camera.RetrieveResult( 5000, ptrGrabResult, TimeoutHandling_ThrowException);
+
+          // Image grabbed successfully?
+          if (ptrGrabResult->GrabSucceeded()){
+              // Access the image data.
+              grabbedImageSize = ptrGrabResult->GetWidth()*ptrGrabResult->GetHeight();
+              std::memcpy( currentImage.ptr(), currentImage.ptr()+grabbedImageSize, totalImageSize-grabbedImageSize);
+              std::memcpy( currentImage.ptr()+totalImageSize-grabbedImageSize, ptrGrabResult->GetBuffer(), grabbedImageSize );
+              cv::Mat img = currentImage.clone();
+              //barcode(img);
+              if (count % 3==0){
+                boost::thread mythread(barcode,img,count);
+              }
+
+              if (count % 3==0){
+                mjpgWritter->write(currentImage);
+              }
+
+              showImage(currentImage);
+
+
+              if (showDebug){
+                if (count % 100==0){
+                  std::cout << "count: " << count << " width: " << ptrGrabResult->GetWidth()  << std::endl;
+                }
+
+              }
+              if (count>65500){
+                count=0;
+              }
+              count++;
+
+          }else{
+              cout << "Error: " << ptrGrabResult->GetErrorCode() << " " << ptrGrabResult->GetErrorDescription() << endl;
+          }
+      }
+  }catch (GenICam::GenericException &e){
+    // Error handling.
+    cerr << "An exception occurred." << endl
+    << e.GetDescription() << endl
+    << e.what() << endl;
+    exitCode = 1;
+  }
+  return exitCode;
 }
 
 int main(int argc, char* argv[])
 {
 
 
+    int exitCode = 0;
 
     args::ArgumentParser parser("Ocrs reconize barcodes live from camera.", "");
     args::HelpFlag help(parser, "help", "Display this help menu", { "help"});
     args::Flag debug(parser, "debug", "Show debug messages", {'d', "debug"});
+    args::Flag window(parser, "window", "Show image window", {'w', "window"});
 
-    args::ValueFlag<int> height(parser, "height", "max image height", { "h"});
+    args::ValueFlag<int> exposure(parser, "exposure", "exposure (1300)", {"exposure"});
+    args::ValueFlag<int> lineheight(parser, "lineheight", "height of one captured image (32)", { "lineheight"});
+    args::ValueFlag<int> height(parser, "height", "max image height", { "height"});
+
+    args::ValueFlag<int> binning(parser, "binning", "binning (default 1)", {"binning"});
+    args::ValueFlag<int> gain(parser, "gain", "gain (default 800)", { "gain"});
     //args::ValueFlag<std::string> filename(parser, "filename", "The filename", {'f',"file"});
 
 
-
-    try
-    {
+    try{
         parser.ParseCLI(argc, argv);
     }catch (args::Help){
         std::cout << parser;
@@ -166,63 +355,31 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-
-    // The exit code of the sample application.
-    int exitCode = 0;
-    char filename[128];
-    char result_filename[128];
-
-
-    unsigned int offset,nx,ny;
-    int adjustAVG = 1;
-
-    int mainAVG = 0;
-    int mainAVGSum = 0;
-    int currentAVG = 0;
-
-    int startAVG = 0;
-    int stopAVG = 0;
-
-    int i=0;
-    int m=0;
-    bool inimage = false;
-    bool usetiff = true;
-    //ofstream pFile;
-    ofstream* pFile;// = new fstream();
-
-    int imageCounter = 0;
-
-    int grabExposure = 800;
-    int grabHeight = 32;
-    int currentHeight = 0;
-
-
-    if(const char* env_start = std::getenv("GRAB_START_AVG")){
-      startAVG = atoi(env_start);
-      adjustAVG=0;
+    if (window==1){
+      showImageWindow=true;
     }
-    if(const char* env_stop = std::getenv("GRAB_STOP_AVG")){
-      stopAVG = atoi(env_stop);
+    if (debug==1){
+      showDebug=true;
     }
 
-    if(const char* env_path = std::getenv("GRAB_PATH")){
-      prefix = env_path;
-    }
-    if(const char* env_exp = std::getenv("GRAB_EXPOSURE")){
-      grabExposure = atoi(env_exp);
-      cout << "setting exposure to " << grabExposure;
-    }
-    if(const char* env_hgt = std::getenv("GRAB_HEIGHT")){
-      grabHeight = atoi(env_hgt);
-    }
+    int int_exposure = 1300;
+    if (exposure) { int_exposure = args::get(exposure); }
+    int int_height = 400;
+    if (height) { int_height = args::get(height); }
+
+    int int_gain = 800;
+    if (gain) { int_gain = args::get(gain); }
+    int int_binning = 1;
+    if (binning) { int_binning = args::get(binning); }
+    int int_lineheight = 32;
+    if (lineheight) { int_lineheight = args::get(lineheight); }
 
 
-    // Comment the following two lines to disable waiting on exit.
-    //cerr << endl << "Press Enter to exit." << endl;
-    //while( cin.get() != '\n');
-
-    if (inimage){
-      pFile->close();
+    mjpgWritter = new MJPGWriter(8080);
+    if (mjpgWritter->isOpened()){
+      std::cout << "opened MJPGWriter " << std::endl;
+      capture(int_exposure,int_lineheight,int_height,int_binning,int_gain);
     }
+
     return exitCode;
 }
