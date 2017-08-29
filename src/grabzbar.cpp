@@ -16,7 +16,7 @@
 #include <iostream>
 
 #include "args.hxx"
-#include "../streamer/mjpeg_server.hpp"
+#include "../mjpeg/mjpeg_server.hpp"
 
 
 boost::mutex mutex;
