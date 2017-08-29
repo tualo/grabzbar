@@ -12,10 +12,14 @@
 #include <boost/thread.hpp>
 #include <boost/chrono.hpp>
 #include <boost/asio.hpp>
+#include <boost/thread/scoped_thread.hpp>
+#include <iostream>
 
 #include "args.hxx"
-#include "MJPGWriter.cpp"
+#include "../streamer/mjpeg_server.hpp"
 
+
+boost::mutex mutex;
 
 using namespace Pylon;
 using namespace GenApi;
@@ -31,7 +35,15 @@ int thres_start = 60;
 int thres_stop = 160;
 int thres_step = 20;
 
-MJPGWriter* mjpgWritter;
+cv::Mat currentImage;
+
+
+
+int glb_grabExposure=0;
+int glb_grabHeight=0;
+int glb_imageHeight=0;
+int glb_grabBinning=0;
+int glb_grabGain=0;
 
 
 bool is_digits(const std::string &str){
@@ -155,13 +167,14 @@ void barcode(cv::Mat part,int count) {
   }
 
 
+
+
 int capture(int grabExposure,int grabHeight, int imageHeight, int grabBinning, int grabGain){
   int exitCode = 0;
   int nbBuffers=10*2;
   int totalImageSize=0;
   int grabbedImageSize=0;
   int count=0;
-  cv::Mat currentImage;
 
   // Automagically call PylonInitialize and PylonTerminate to ensure the pylon runtime system
   // is initialized during the lifetime of this object.
@@ -292,9 +305,6 @@ int capture(int grabExposure,int grabHeight, int imageHeight, int grabBinning, i
                 boost::thread mythread(barcode,img,count);
               }
 
-              if (count % 3==0){
-                mjpgWritter->write(currentImage);
-              }
 
               showImage(currentImage);
 
@@ -323,6 +333,48 @@ int capture(int grabExposure,int grabHeight, int imageHeight, int grabBinning, i
   }
   return exitCode;
 }
+
+void run_capture(){
+   capture(glb_grabExposure,glb_grabHeight, glb_imageHeight, glb_grabBinning, glb_grabGain);
+}
+
+
+void run_streamer()
+{
+    using namespace http::server;
+    // Run server in background thread.
+    std::size_t num_threads = 3;
+    std::string doc_root = "./";
+    //this initializes the redirect behavor, and the /_all handlers
+    server_ptr s = init_streaming_server("0.0.0.0", "8080", doc_root, num_threads);
+    streamer_ptr stmr(new streamer);//a stream per image, you can register any number of these.
+    register_streamer(s, stmr, "/stream_0");
+    s->start();
+    while (true){
+
+
+      mutex.lock();
+      std::cout << "run streamer" << std::endl;
+
+      cv::Mat image = currentImage.clone();
+      std::cout << "run streamer -" << currentImage.cols << std::endl;
+      mutex.unlock();
+
+      //fill image somehow here. from camera or something.
+      bool wait = false; //don't wait for there to be more than one webpage looking at us.
+      int quality = 75; //quality of jpeg compression [0,100]
+      int ms = 33;
+      if( (currentImage.cols==0)|| (currentImage.rows>0)){
+        image = cv::Mat(cv::Size(640, 480), CV_8UC3, cv::Scalar(std::rand() % 255, std::rand() % 255, std::rand() % 255));
+        ms = 1000;
+      }
+      int n_viewers = stmr->post_image(image,quality, wait);
+
+      //use boost sleep so that our loop doesn't go out of control.
+      boost::this_thread::sleep(boost::posix_time::milliseconds(ms)); //30 FPS
+    }
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -375,11 +427,16 @@ int main(int argc, char* argv[])
     if (lineheight) { int_lineheight = args::get(lineheight); }
 
 
-    mjpgWritter = new MJPGWriter(8080);
-    if (mjpgWritter->isOpened()){
-      std::cout << "opened MJPGWriter " << std::endl;
-      capture(int_exposure,int_lineheight,int_height,int_binning,int_gain);
-    }
+    glb_grabExposure=int_exposure;
+    glb_grabHeight=int_lineheight;
+    glb_imageHeight=int_height;
+    glb_grabBinning=int_binning;
+    glb_grabGain=int_gain;
 
+    boost::thread t_streamer{run_streamer};
+    boost::thread t_capture{run_capture};
+    t_capture.join();
+    t_streamer.join();
+    //capture(int_exposure,int_lineheight,int_height,int_binning,int_gain);
     return exitCode;
 }
