@@ -38,13 +38,13 @@ HEADERS := $(shell find . -name '*.h')
 
 
 $(NAME).o: $(SOURCES) $(HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./streamer/server.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./streamer/request_parser.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./streamer/request_handler.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./streamer/reply.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./streamer/mjpeg_server.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./streamer/mime_types.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./streamer/connection.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./mjpeg/server.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./mjpeg/request_parser.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./mjpeg/request_handler.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./mjpeg/reply.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./mjpeg/mjpeg_server.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./mjpeg/mime_types.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./mjpeg/connection.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./src/grabzbar.cpp
 
 
