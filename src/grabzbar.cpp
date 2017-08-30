@@ -370,14 +370,12 @@ void run_streamer()
       //fill image somehow here. from camera or something.
       bool wait = false; //don't wait for there to be more than one webpage looking at us.
       int quality = 75; //quality of jpeg compression [0,100]
-      int ms = 33;
+      int ms = 60;
       if( (currentImage.cols==0)|| (currentImage.rows==0)){
         image = cv::Mat(cv::Size(640, 480), CV_8UC3, cv::Scalar(std::rand() % 255, std::rand() % 255, std::rand() % 255));
         ms = 1000;
       }
-      int n_viewers = stmr->post_image(image,quality, wait);
       frame_count++;
-
       baseline=0;
       text="Img No. "+frame_count;
       cv::Size textSize = cv::getTextSize(text, fontFace, fontScale, thickness, &baseline);
@@ -386,6 +384,7 @@ void run_streamer()
       cv::Point textOrg((image.cols - textSize.width)/2, (image.rows + textSize.height)/2);
       cv::putText(image, text, textOrg, fontFace, fontScale,   cv::Scalar::all(255), thickness, 8);
 
+      int n_viewers = stmr->post_image(image,quality, wait);
       //use boost sleep so that our loop doesn't go out of control.
       boost::this_thread::sleep(boost::posix_time::milliseconds(ms)); //30 FPS
     }
