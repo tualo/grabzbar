@@ -350,6 +350,7 @@ void run_streamer()
     double fontScale = 2;
     int thickness = 3;
     int baseline=0;
+    std::string text="";
 
     //this initializes the redirect behavor, and the /_all handlers
     server_ptr s = init_streaming_server("0.0.0.0", "8080", doc_root, num_threads);
@@ -378,11 +379,12 @@ void run_streamer()
       frame_count++;
 
       baseline=0;
+      text="Img No. "+frame_count;
       cv::Size textSize = cv::getTextSize(text, fontFace, fontScale, thickness, &baseline);
       baseline += thickness;
       // center the text
-      cv::Point textOrg((img.cols - textSize.width)/2, (img.rows + textSize.height)/2);
-      cv::putText(img, text, textOrg, fontFace, fontScale,   cv::Scalar::all(255), thickness, 8);
+      cv::Point textOrg((image.cols - textSize.width)/2, (img.rows + textSize.height)/2);
+      cv::putText(image, text, textOrg, fontFace, fontScale,   cv::Scalar::all(255), thickness, 8);
 
       //use boost sleep so that our loop doesn't go out of control.
       boost::this_thread::sleep(boost::posix_time::milliseconds(ms)); //30 FPS
