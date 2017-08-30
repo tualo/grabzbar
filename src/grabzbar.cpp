@@ -386,6 +386,9 @@ void run_streamer()
       cv::Point textOrg((image.cols - textSize.width)/2, (image.rows + textSize.height)/2);
       cv::putText(image, text, textOrg, fontFace, fontScale,   cv::Scalar::all(255), thickness, 8);
 
+
+      std::cout << text << std::endl;
+
       int n_viewers = stmr->post_image(image,quality, wait);
       //use boost sleep so that our loop doesn't go out of control.
       boost::this_thread::sleep(boost::posix_time::milliseconds(ms)); //30 FPS
