@@ -382,7 +382,7 @@ void run_streamer()
       frame_count++;
       baseline=0;
       imgtext = (frmt % frame_count).str();
-      cv::Size textSize = cv::getTextSize(text, fontFace, fontScale, thickness, &baseline);
+      cv::Size textSize = cv::getTextSize(imgtext, fontFace, fontScale, thickness, &baseline);
       baseline += thickness;
       // center the text
       cv::Point textOrg((image.cols - textSize.width)/2, (image.rows + textSize.height)/2);
