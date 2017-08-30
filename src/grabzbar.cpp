@@ -217,10 +217,10 @@ int capture(int grabExposure,int grabHeight, int imageHeight, int grabBinning, i
       cout << "ExposureTimeBaseAbs Value : "
            <<  nodemap.GetNode( "ExposureTimeBaseAbs")  << endl;
 
-           CIntegerPtr gainRaw(nodemap.GetNode("GainRaw"));
+    CIntegerPtr gainRaw(nodemap.GetNode("GainRaw"));
 
     if(gainRaw.IsValid()) {
-
+     gainRaw->SetValue(grabGain);
      cout << "GainRaw Min : "
           <<  gainRaw->GetMin()  << endl;
      cout << "GainRaw Max : "
