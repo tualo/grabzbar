@@ -383,7 +383,7 @@ void run_streamer()
       cv::Size textSize = cv::getTextSize(text, fontFace, fontScale, thickness, &baseline);
       baseline += thickness;
       // center the text
-      cv::Point textOrg((image.cols - textSize.width)/2, (img.rows + textSize.height)/2);
+      cv::Point textOrg((image.cols - textSize.width)/2, (image.rows + textSize.height)/2);
       cv::putText(image, text, textOrg, fontFace, fontScale,   cv::Scalar::all(255), thickness, 8);
 
       //use boost sleep so that our loop doesn't go out of control.
