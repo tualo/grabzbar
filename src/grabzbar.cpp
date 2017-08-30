@@ -363,10 +363,7 @@ void run_streamer()
 
 
       mutex.lock();
-      std::cout << "run streamer" << std::endl;
-
       cv::Mat image = currentImage.clone();
-      std::cout << "run streamer -" << image.cols << " x " << image.rows << std::endl;
       mutex.unlock();
 
       //fill image somehow here. from camera or something.
