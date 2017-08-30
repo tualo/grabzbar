@@ -129,7 +129,7 @@ namespace http
       rep.headers.clear();
       rep.content.clear();
       //rep.headers.push_back(header("Location", "" + path + "/" + boost::lexical_cast<std::string>(std::rand())));
-//      rep.headers.push_back(header("Location", "/_stream" + path + "/" + boost::lexical_cast<std::string>(std::rand())));
+      rep.headers.push_back(header("Location", "./_stream" + path + "/" + boost::lexical_cast<std::string>(std::rand())));
       conn->async_write(rep.to_buffers());
     }
 
