@@ -12,6 +12,7 @@
 #include <boost/thread.hpp>
 #include <boost/chrono.hpp>
 #include <boost/asio.hpp>
+#include <boost/format.hpp>
 #include <boost/thread/scoped_thread.hpp>
 #include <iostream>
 
@@ -350,7 +351,8 @@ void run_streamer()
     double fontScale = 1;
     int thickness = 1;
     int baseline=0;
-    std::string text="";
+    std::string imgtext="";
+    boost::format frmt("No.: %1%");
 
     //this initializes the redirect behavor, and the /_all handlers
     server_ptr s = init_streaming_server("0.0.0.0", "8080", doc_root, num_threads);
@@ -379,12 +381,12 @@ void run_streamer()
 
       frame_count++;
       baseline=0;
-      text = "Img No. "+frame_count;
+      imgtext = (frmt % frame_count).str();
       cv::Size textSize = cv::getTextSize(text, fontFace, fontScale, thickness, &baseline);
       baseline += thickness;
       // center the text
       cv::Point textOrg((image.cols - textSize.width)/2, (image.rows + textSize.height)/2);
-      cv::putText(image, text, textOrg, fontFace, fontScale,   cv::Scalar::all(255), thickness, 8);
+      cv::putText(image, imgtext, textOrg, fontFace, fontScale,   cv::Scalar::all(255), thickness, 8);
 
 
       std::cout << text << std::endl;
