@@ -345,6 +345,12 @@ void run_streamer()
     // Run server in background thread.
     std::size_t num_threads = 3;
     std::string doc_root = "./";
+    int frame_count = 0;
+    int fontFace = cv::FONT_HERSHEY_SCRIPT_SIMPLEX;
+    double fontScale = 2;
+    int thickness = 3;
+    int baseline=0;
+
     //this initializes the redirect behavor, and the /_all handlers
     server_ptr s = init_streaming_server("0.0.0.0", "8080", doc_root, num_threads);
     streamer_ptr stmr(new streamer);//a stream per image, you can register any number of these.
@@ -369,6 +375,14 @@ void run_streamer()
         ms = 1000;
       }
       int n_viewers = stmr->post_image(image,quality, wait);
+      frame_count++;
+
+      baseline=0;
+      cv::Size textSize = cv::getTextSize(text, fontFace, fontScale, thickness, &baseline);
+      baseline += thickness;
+      // center the text
+      cv::Point textOrg((img.cols - textSize.width)/2, (img.rows + textSize.height)/2);
+      cv::putText(img, text, textOrg, fontFace, fontScale,   cv::Scalar::all(255), thickness, 8);
 
       //use boost sleep so that our loop doesn't go out of control.
       boost::this_thread::sleep(boost::posix_time::milliseconds(ms)); //30 FPS
