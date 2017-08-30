@@ -357,14 +357,14 @@ void run_streamer()
       std::cout << "run streamer" << std::endl;
 
       cv::Mat image = currentImage.clone();
-      std::cout << "run streamer -" << currentImage.cols << std::endl;
+      std::cout << "run streamer -" << image.cols << " x " << image.rows << std::endl;
       mutex.unlock();
 
       //fill image somehow here. from camera or something.
       bool wait = false; //don't wait for there to be more than one webpage looking at us.
       int quality = 75; //quality of jpeg compression [0,100]
       int ms = 33;
-      if( (currentImage.cols==0)|| (currentImage.rows>0)){
+      if( (currentImage.cols==0)|| (currentImage.rows==0)){
         image = cv::Mat(cv::Size(640, 480), CV_8UC3, cv::Scalar(std::rand() % 255, std::rand() % 255, std::rand() % 255));
         ms = 1000;
       }
