@@ -346,9 +346,9 @@ void run_streamer()
     std::size_t num_threads = 3;
     std::string doc_root = "./";
     int frame_count = 0;
-    int fontFace = cv::FONT_HERSHEY_SCRIPT_SIMPLEX;
-    double fontScale = 2;
-    int thickness = 3;
+    int fontFace = cv::CV_FONT_HERSHEY_SIMPLEX;
+    double fontScale = 1;
+    int thickness = 1;
     int baseline=0;
     std::string text="";
 
@@ -375,9 +375,11 @@ void run_streamer()
         image = cv::Mat(cv::Size(640, 480), CV_8UC3, cv::Scalar(std::rand() % 255, std::rand() % 255, std::rand() % 255));
         ms = 1000;
       }
+
+
       frame_count++;
       baseline=0;
-      text="Img No. "+frame_count;
+      text = "Img No. "+frame_count;
       cv::Size textSize = cv::getTextSize(text, fontFace, fontScale, thickness, &baseline);
       baseline += thickness;
       // center the text
