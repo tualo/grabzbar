@@ -346,7 +346,7 @@ void run_streamer()
     std::size_t num_threads = 3;
     std::string doc_root = "./";
     int frame_count = 0;
-    int fontFace = cv::CV_FONT_HERSHEY_SIMPLEX;
+    int fontFace = cv::FONT_HERSHEY_SIMPLEX;
     double fontScale = 1;
     int thickness = 1;
     int baseline=0;
