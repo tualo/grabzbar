@@ -389,7 +389,6 @@ void run_streamer()
       cv::putText(image, imgtext, textOrg, fontFace, fontScale,   cv::Scalar::all(255), thickness, 8);
 
 
-      std::cout << text << std::endl;
 
       int n_viewers = stmr->post_image(image,quality, wait);
       //use boost sleep so that our loop doesn't go out of control.
