@@ -437,6 +437,12 @@ int main(int argc, char* argv[])
 
     args::ValueFlag<int> binning(parser, "binning", "binning (default 1)", {"binning"});
     args::ValueFlag<int> gain(parser, "gain", "gain (default 800)", { "gain"});
+
+
+    args::ValueFlag<int> bc_thres_start(parser, "bc_thres_start", "bc_thres_start (default 60)", { "bc_thres_start"});
+    args::ValueFlag<int> bc_thres_stop(parser, "bc_thres_stop", "bc_thres_stop (default 160)", { "bc_thres_stop"});
+    args::ValueFlag<int> bc_thres_step(parser, "bc_thres_step", "bc_thres_step (default 20)", { "bc_thres_step"});
+    args::Flag bc_clahe(parser, "bc_clahe", "bc_clahe (default off)", { "bc_clahe"});
     //args::ValueFlag<std::string> filename(parser, "filename", "The filename", {'f',"file"});
 
 
@@ -469,6 +475,12 @@ int main(int argc, char* argv[])
     if (binning) { int_binning = args::get(binning); }
     int int_lineheight = 32;
     if (lineheight) { int_lineheight = args::get(lineheight); }
+
+
+    if (bc_thres_start) { thres_start = args::get(bc_thres_start); }
+    if (bc_thres_stop) { thres_stop = args::get(bc_thres_stop); }
+    if (bc_thres_step) { thres_step = args::get(bc_thres_step); }
+    if (bc_clahe==1) { barcodeClahe=true; }
 
 
     glb_grabExposure=int_exposure;
