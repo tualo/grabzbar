@@ -93,6 +93,7 @@ void barcode(cv::Mat part) {
   cv::Mat image_clahe;
   if (barcodeClahe==true){
     cv::Mat lab_image;
+    cv::cvtColor(part, part, CV_GRAY2BGR);
     cv::cvtColor(part, lab_image, CV_BGR2Lab);
 
     // Extract the L channel
