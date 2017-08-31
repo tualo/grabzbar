@@ -47,6 +47,20 @@ int glb_grabBinning=0;
 int glb_grabGain=0;
 
 
+double debug_start_time = (double)cv::getTickCount();
+double debug_last_time = (double)cv::getTickCount();
+double debug_window_offset = 0;
+
+bool bDebugTime=true;
+void debugTime(std::string str){
+  if (bDebugTime){
+    double time_since_start = ((double)cv::getTickCount() - debug_start_time)/cv::getTickFrequency();
+    double time_since_last = ((double)cv::getTickCount() - debug_last_time)/cv::getTickFrequency();
+    std::cout << str << ": " << time_since_last << "s " << "(total: " << time_since_start  << "s)" << std::endl;
+  }
+  debug_last_time = (double)cv::getTickCount();
+}
+
 bool is_digits(const std::string &str){
     return std::all_of(str.begin(), str.end(), ::isdigit); // C++11
 }
@@ -59,7 +73,7 @@ void showImage(cv::Mat& src){
   }
 }
 
-void barcode(cv::Mat part,int count) {
+void barcode(cv::Mat part) {
 
   cv::Mat gray;
   cv::Mat norm;
@@ -74,9 +88,7 @@ void barcode(cv::Mat part,int count) {
   int rel=0;
   int tmp=0;
   bool codeRetry=false;
-  if (showDebug){
-    //std::cout << "barcode_internal " << count << std::endl;
-  }
+
 
   cv::Mat image_clahe;
   if (barcodeClahe==true){
@@ -159,13 +171,13 @@ void barcode(cv::Mat part,int count) {
 
 
 
-      }
-      image.set_data(NULL, 0);
-      scanner.recycle_image(image);
     }
-
-
+    image.set_data(NULL, 0);
+    scanner.recycle_image(image);
   }
+
+  debugTime("barcode done");
+}
 
 
 
@@ -302,9 +314,11 @@ int capture(int grabExposure,int grabHeight, int imageHeight, int grabBinning, i
               std::memcpy( currentImage.ptr()+totalImageSize-grabbedImageSize, ptrGrabResult->GetBuffer(), grabbedImageSize );
               cv::Mat img = currentImage.clone();
               //barcode(img);
+              /*
               if (count % 3==0){
                 boost::thread mythread(barcode,img,count);
               }
+              */
 
 
               showImage(currentImage);
@@ -339,6 +353,18 @@ void run_capture(){
    capture(glb_grabExposure,glb_grabHeight, glb_imageHeight, glb_grabBinning, glb_grabGain);
 }
 
+void run_barcode() {
+
+//  void barcode(cv::Mat part,int count) {
+
+  while(true){
+    mutex.lock();
+    cv::Mat image = currentImage.clone();
+    mutex.unlock();
+
+    barcode(image);
+  }
+}
 
 void run_streamer()
 {
@@ -453,8 +479,11 @@ int main(int argc, char* argv[])
 
     boost::thread t_streamer{run_streamer};
     boost::thread t_capture{run_capture};
+    boost::thread t_barcode{run_barcode};
+
     t_capture.join();
     t_streamer.join();
+    t_barcode.join();
     //capture(int_exposure,int_lineheight,int_height,int_binning,int_gain);
     return exitCode;
 }
