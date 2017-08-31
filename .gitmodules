@@ -1,3 +1,6 @@
 [submodule "streamer"]
 	path = streamer
 	url = https://github.com/ethanrublee/streamer
+[submodule "ocrs"]
+	path = ocrs
+	url = git://github.com/tualo/ocrs.git

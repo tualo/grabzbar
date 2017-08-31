@@ -113,9 +113,9 @@ namespace http
     bool
     request_handler::split_path_query(const std::string& in, std::string& path, std::string& query)
     {
-      using namespace std;
+
       using namespace boost;
-      typedef vector<string> split_vector_type;
+      typedef std::vector<std::string> split_vector_type;
 
       split_vector_type SplitVec; // #2: Search for tokens
       split(SplitVec, in, is_any_of("?")); // SplitVec == { "hello abc","ABC","aBc goodbye" }
@@ -134,7 +134,6 @@ namespace http
     bool
     request_handler::split_query(const std::string& query, std::vector<std::string>& sv)
     {
-      using namespace std;
       using namespace boost;
       split(sv, query, is_any_of("&;"));
       return true;
