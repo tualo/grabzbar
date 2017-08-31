@@ -89,6 +89,9 @@ void barcode(cv::Mat part) {
   int tmp=0;
   bool codeRetry=false;
 
+  if (part.cols==0){
+    return;
+  }
 
   cv::Mat image_clahe;
   if (barcodeClahe==true){
