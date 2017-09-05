@@ -69,6 +69,7 @@ int blockSize=55;
 int subtractMean=20;
 
 std::list<cv::Mat> stressTestList;
+std::list<cv::Mat>::iterator it;
 cv::Mat stressTestImage;
 
 // --- Ocrs
@@ -93,9 +94,21 @@ bool is_digits(const std::string &str){
 
 void showImage(cv::Mat& src){
   if (showImageWindow){
+    if (src.cols>0){
+      cv::Mat rotated=src.clone();
+      int x=src.cols /5;
+      int y=src.rows /5;
+      cv::Mat res = cv::Mat(x, y, CV_8UC1);
+      cv::resize(rotated, res, cv::Size(x, y), 0, 0, 3);
+      cv::namedWindow("DEBUG", CV_WINDOW_AUTOSIZE );
+      cv::imshow("DEBUG", res );
+      cv::waitKey(1);
+    }
+    /*
     cv::namedWindow("grabzbar", CV_WINDOW_AUTOSIZE );
     cv::imshow("grabzbar", src );
     cv::waitKey(1);
+    */
   }
 }
 
@@ -451,38 +464,75 @@ void run_streamer()
 
 void run_stresstest_image()
 {
+  debugTime("start stress image");
+  std::cout << "sim image cols " << stressTestImage.cols << std::endl;
+
+  MYSQL *con = nullptr;
+  ImageRecognizeEx* ir = ocr_ext(
+    con,
+    std_str_machine,
+    str_db_host,
+    str_db_user,
+    str_db_name,
+    str_db_password,
+    str_db_encoding,
+    blockSize,
+    subtractMean,
+    true,
+    false,
+    false//debugwindow==1
+  );
+  ir->setPixelPerCM(int_pixel_cm_x,int_pixel_cm_y);
   ir->setImage(stressTestImage.clone());
   ir->rescale();
   debugTime("after rescale");
   ir->barcode();
   debugTime("after barcode");
-  ir->texts();
+  ExtractAddress* ea = ir->texts();
+
+    mutex.lock();
+    if (ea->foundAddress()){
+      std::cout << "ZipCode " << ea->getZipCode() << std::endl;
+    }else{
+      std::cout << "No ZipCode " << std::endl;
+    }
+    mutex.unlock();
+
   debugTime("after texts");
 }
 
 void run_stresstest()
 {
-  int ms = 1000/4;
+  int ms = 1000/1;
   int loopIndex = 0;
   int f=0;
   while(true){
-    loopIndex++;
-    if (loopIndex==stressTestList.size()){
-      loopIndex=0;
-    }
+
+
 
     // Iterate and print values of the list
+    /*
     for (cv::Mat n : stressTestList) {
       if (f==loopIndex){
         stressTestImage = n;
+        std::cout << "sim image " << f << " - " << n.cols << std::endl;
         boost::thread t{run_stresstest_image};
         break;
       }
       f++;
     }
+    */
+    stressTestImage = *it;
+    boost::thread t{run_stresstest_image};
+
+    if (it == stressTestList.end()){
+      it = stressTestList.begin();
+    }
+    ++it;
     boost::this_thread::sleep(boost::posix_time::milliseconds(ms));
   }
 }
+
 
 int main(int argc, char* argv[])
 {
@@ -601,7 +651,7 @@ int main(int argc, char* argv[])
           subtractMean,
           debug==1,
           debugtime==1,
-          debugwindow==1
+          false//debugwindow==1
         );
         ir->setPixelPerCM(int_pixel_cm_x,int_pixel_cm_y);
       }else{
@@ -619,13 +669,24 @@ int main(int argc, char* argv[])
 
     if (stresstest==1){
 
-
+      int limit = 1000;
       glob::Glob glob((args::get(stresstest_images)).c_str());
       while (glob) {
-        std::cout << "add to stresstest: "<< glob.GetFileName() << std::endl;
-        stressTestList.push_back( cv::imread(glob.GetFileName(),cv::IMREAD_GRAYSCALE) );
+        std::string fullFileName = glob.getPath()+"/"+glob.GetFileName();
+        cv::Mat m = cv::imread(fullFileName,cv::IMREAD_GRAYSCALE);
+        std::cout << "add to stresstest: " << fullFileName  << " channels  " << m.channels() << std::endl;
+        stressTestList.push_back( m );
         glob.Next();
+
+        limit--;
+        if (limit==0){
+          break;
+        }
+
       }
+      it=stressTestList.begin();
+      boost::thread t_stresstest{run_stresstest};
+
 
     }
 
@@ -635,7 +696,11 @@ int main(int argc, char* argv[])
     boost::thread t_streamer{run_streamer};
     boost::thread t_capture{run_capture};
     boost::thread t_barcode{run_barcode};
-
+    if (debugwindow==1){
+      while(true){
+        showImage(ir->roiImage);
+      }
+    }
     t_capture.join();
     t_streamer.join();
     t_barcode.join();
