@@ -480,7 +480,8 @@ void run_stresstest_image()
     subtractMean,
     true,
     false,
-    false//debugwindow==1
+    false,//debugwindow==1
+    true
   );
   ir->setPixelPerCM(int_pixel_cm_x,int_pixel_cm_y);
   ir->setImage(stressTestImage.clone());
@@ -539,7 +540,7 @@ int main(int argc, char* argv[])
 
 
     int exitCode = 0;
-
+    std::cout << "hardware_concurrency:  " << boost::thread::hardware_concurrency() << std::endl;
     args::ArgumentParser parser("Ocrs reconize barcodes live from camera.", "");
     args::HelpFlag help(parser, "help", "Display this help menu", { "help"});
     args::Flag debug(parser, "debug", "Show debug messages", {'d', "debug"});
@@ -583,6 +584,7 @@ int main(int argc, char* argv[])
     args::ValueFlag<int> pixel_cm_y(parser, "cm_y", "Pixel per CM Y (default 73)", {"cmy"});
     args::ValueFlag<int> blocksize(parser, "blocksize", "adaptiveThreshold Blocksize (default 55)", {"blocksize"});
     args::ValueFlag<int> substractmean(parser, "substractmean", "adaptiveThreshold subtractMean (default 20)", {"substractmean"});
+    args::Flag calculatemean(parser, "calculatemean", "calculatemean default off", {"calculatemean"});
     args::ValueFlag<std::string> machine(parser, "machine", "The machine ID", {"machine"});
 
 
@@ -651,7 +653,8 @@ int main(int argc, char* argv[])
           subtractMean,
           debug==1,
           debugtime==1,
-          false//debugwindow==1
+          false,//debugwindow==1,
+          calculatemean==1
         );
         ir->setPixelPerCM(int_pixel_cm_x,int_pixel_cm_y);
       }else{
