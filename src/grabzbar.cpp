@@ -13,6 +13,7 @@
 #include <boost/chrono.hpp>
 #include <boost/asio.hpp>
 #include <boost/format.hpp>
+
 #include <boost/thread/scoped_thread.hpp>
 #include <iostream>
 
@@ -73,6 +74,9 @@ std::list<cv::Mat>::iterator it;
 cv::Mat stressTestImage;
 
 // --- Ocrs
+
+
+
 
 double debug_start_time = (double)cv::getTickCount();
 double debug_last_time = (double)cv::getTickCount();
@@ -695,7 +699,6 @@ int main(int argc, char* argv[])
 
 
 
-
     boost::thread t_streamer{run_streamer};
     boost::thread t_capture{run_capture};
     boost::thread t_barcode{run_barcode};
@@ -707,6 +710,7 @@ int main(int argc, char* argv[])
     t_capture.join();
     t_streamer.join();
     t_barcode.join();
+
     //capture(int_exposure,int_lineheight,int_height,int_binning,int_gain);
     return exitCode;
 }
