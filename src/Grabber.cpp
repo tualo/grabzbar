@@ -141,6 +141,8 @@ std::string Grabber::getFileName(){
 }
 
 void Grabber::run(){
+  runningTasks++;
+  runningTasks++;
   boost::thread* t_streamer = new boost::thread(&Grabber::run_streamer, this);
   boost::thread* t_capture = new boost::thread(&Grabber::run_capture, this);
   t_capture->join();
@@ -459,7 +461,7 @@ void Grabber::run_capture(){
 void Grabber::run_streamer(){
     using namespace http::server;
     // Run server in background thread.
-    std::size_t num_threads = 3;
+    std::size_t num_threads = 2;
     std::string doc_root = "./";
     int frame_count = 0;
     int fontFace = cv::FONT_HERSHEY_SIMPLEX;
@@ -485,7 +487,7 @@ void Grabber::run_streamer(){
       bool wait = false; //don't wait for there to be more than one webpage looking at us.
       int quality = 75; //quality of jpeg compression [0,100]
       int ms = 60;
-      if( (currentImage.cols==0)|| (currentImage.rows==0)){
+      if( (image.cols==0)|| (image.rows==0)){
         image = cv::Mat(cv::Size(640, 480), CV_8UC3, cv::Scalar(std::rand() % 255, std::rand() % 255, std::rand() % 255));
         ms = 1000;
       }
