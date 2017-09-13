@@ -15,7 +15,7 @@ CXX				?= g++
 
 LD         := $(CXX)
 CPPFLAGS   := $(shell mysql_config --cflags) $(shell pkg-config zbar --cflags) $(shell pkg-config opencv --cflags) $(shell pkg-config tesseract --cflags)
-CXXFLAGS   := -std=c++11 #e.g., CXXFLAGS=-g -O0 for debugging
+CXXFLAGS   := -std=c++14 -O3 -Ofast #e.g., CXXFLAGS=-g -O0 for debugging
 LDFLAGS    :=
 LDLIBS     := $(shell mysql_config --libs) $(shell pkg-config zbar --cflags --libs) $(shell pkg-config opencv --libs) $(shell pkg-config tesseract --libs)
 
