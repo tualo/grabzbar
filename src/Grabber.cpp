@@ -428,7 +428,7 @@ void Grabber::run_capture(){
                 std::cerr << "image larger than max size (" << _maxImageHeight << ")" << std::endl;
                 std::cerr << "stopping bbs service" << std::endl;
                 mutex.unlock();
-                system_result = system( "service bbs stop" )
+                system_result = system( "service bbs stop" );
                 boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
                 system_result = system( "service bbs start" );
               }
