@@ -405,7 +405,7 @@ void Grabber::run_capture(){
               grabbedImageSize = ptrGrabResult->GetWidth()*ptrGrabResult->GetHeight();
               mutex.lock();
               std::memcpy(
-                currentImage.ptr()+(_maxImageHeight*ptrGrabResult->GetWidth()),
+                currentImage.ptr()+(currentHeight*ptrGrabResult->GetWidth()),
                 ptrGrabResult->GetBuffer(),
                 grabbedImageSize
               );
