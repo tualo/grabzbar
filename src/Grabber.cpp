@@ -243,6 +243,8 @@ void Grabber::run_capture(){
 
   mutex.unlock();
 
+  int system_result=0;
+
   while(true){
     adjustAVG=10;
     // Automagically call PylonInitialize and PylonTerminate to ensure the pylon runtime system
@@ -425,10 +427,10 @@ void Grabber::run_capture(){
                 mutex.lock();
                 std::cerr << "image larger than max size (" << _maxImageHeight << ")" << std::endl;
                 std::cerr << "stopping bbs service" << std::endl;
-                system( "service bbs stop" );
-                sleep(10);
-                system( "service bbs start" );
                 mutex.unlock();
+                system_result = system( "service bbs stop" )
+                boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+                system_result = system( "service bbs start" );
               }
             }
 
