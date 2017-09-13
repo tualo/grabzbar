@@ -307,7 +307,7 @@ void Grabber::run_capture(){
       std::cout << "Grab Height Value : " <<  _grabHeight  << std::endl;
       std::cout << "Grab Exposure Value : " <<  camera.ExposureTimeRaw.GetValue()  << std::endl;
 
-      std::cout << "Grab Exposure Value (in ns) : " <<  100 * camera.ExposureTimeRaw.GetValue())  << std::endl;
+      std::cout << "Grab Exposure Value (in ns) : " <<  100 * camera.ExposureTimeRaw.GetValue() << std::endl;
 
       std::cout << "Grab Gain Value : " <<  _grabGain  << std::endl;
       std::cout << "Grab Binning Value : " <<  _grabBinning  << std::endl;
