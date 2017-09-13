@@ -50,7 +50,7 @@ endif
 all				: $(NAME)
 
 $(NAME)			: $(NAME).o
-	$(LD) $(LDFLAGS) -v -o $@ RegionOfInterest.o ExtractAddress.o glob_posix.o ImageRecognizeEx.o server.o request_parser.o request_handler.o reply.o mjpeg_server.o mime_types.o connection.o grabzbar.o $(LDLIBS)
+	$(LD) $(LDFLAGS) -v -o $@ RegionOfInterest.o ExtractAddress.o glob_posix.o ImageRecognizeEx.o ocr_ext.o server.o request_parser.o request_handler.o reply.o mjpeg_server.o mime_types.o connection.o Grabber.o grabzbar.o $(LDLIBS)
 
 SOURCES := $(shell find . -name '*.cpp')
 HEADERS := $(shell find . -name '*.h')
@@ -70,7 +70,10 @@ $(NAME).o: $(SOURCES) $(HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./ocrs/new/glob_posix.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./ocrs/new/ExtractAddress.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./ocrs/new/ImageRecognizeEx.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./ocrs/new/ImageRecognizeEx.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./ocrs/new/ocr_ext.cpp
+
+
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./src/Grabber.cpp
 
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./src/grabzbar.cpp
 
@@ -83,4 +86,6 @@ clean			:
 
 
 install		: $(NAME)
-	echo "not implemented"
+	mkdir /opt/grab
+	cp $(NAME) /opt/grab/$(NAME)
+	echo "copy file $(NAME) to /usr/bin/$(NAME)"

@@ -1,0 +1,14 @@
+[Unit]
+Description=Image Grabing Service
+After=network.target
+
+[Service]
+#Type=forking
+#PIDFile=/var/run/grab.pid
+Restart=always
+#EnvironmentFile=/etc/sysconfig/grab-environment
+ExecStart=/bin/sh -c "/opt/grab/grab-start.sh"
+User=root
+
+[Install]
+WantedBy=multi-user.target
