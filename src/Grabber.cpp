@@ -274,7 +274,7 @@ void Grabber::run_capture(){
       std::cout << "Firmware version : " << CStringPtr( nodemap.GetNode( "DeviceFirmwareVersion") )->GetValue() << std::endl;
       std::cout << "ExposureTimeRaw Min : "  << CIntegerPtr( nodemap.GetNode( "ExposureTimeRaw") )->GetMin() << std::endl;
       std::cout << "ExposureTimeRaw Max : " << CIntegerPtr( nodemap.GetNode( "ExposureTimeRaw") )->GetMax() << std::endl;
-      std::cout << "ExposureTimeBaseAbs Value : "  << camera.ExposureTimeBaseAbs.GetValue()  << "ns"<< std::endl;
+      //std::cout << "ExposureTimeBaseAbs Value : "  << camera.ExposureTimeBaseAbs.GetValue() << std::endl;
       mutex.unlock();
 
       CIntegerPtr gainRaw(nodemap.GetNode("GainRaw"));
@@ -307,7 +307,7 @@ void Grabber::run_capture(){
       std::cout << "Grab Height Value : " <<  _grabHeight  << std::endl;
       std::cout << "Grab Exposure Value : " <<  camera.ExposureTimeRaw.GetValue()  << std::endl;
 
-      std::cout << "Grab Exposure Value (in ns) : " <<  (CIntegerPtr( nodemap.GetNode( "ExposureTimeBaseAbs") )->GetValue() * camera.ExposureTimeRaw.GetValue())  << std::endl;
+      std::cout << "Grab Exposure Value (in ns) : " <<  100 * camera.ExposureTimeRaw.GetValue())  << std::endl;
 
       std::cout << "Grab Gain Value : " <<  _grabGain  << std::endl;
       std::cout << "Grab Binning Value : " <<  _grabBinning  << std::endl;
