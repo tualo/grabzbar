@@ -1,5 +1,7 @@
 #include "Grabber.h"
 
+boost::format quicksvfmt("call quicksv('%s','%s','%s','%s','%s', '%s','%s','%s','%s','%s' ");
+
 Grabber::Grabber():
   runningTasks(0),
   glb_grabExposure(1300),
@@ -69,6 +71,25 @@ void Grabber::ocrthread(cv::Mat img) {
   if (mysql_query(con, sql_regiogruppe.c_str())){
   }
 
+  std::string customer="";
+  std::string line;
+  std::ifstream cfile ("/opt/grab/customer.txt");
+  if (cfile.is_open())
+  {
+    while ( getline (cfile,line) )
+    {
+      customer = line;
+      break;
+    }
+    cfile.close();
+  }
+  std::vector<std::string> kstrs;
+  boost::split(kstrs,customer,boost::is_any_of("|"));
+  if (kstrs.size()==2){
+    ir->setKundennummer(kstrs[0]);
+    ir->setKostenstelle(kstrs[1]);
+  }
+
   ir->setPixelPerCM(int_pixel_cm_x,int_pixel_cm_y);
   ir->setImage(img);
   ir->rescale();
@@ -84,9 +105,44 @@ void Grabber::ocrthread(cv::Mat img) {
   }else{
     std::cout << "No ZipCode " << std::endl;
   }
+
+  std::string sql = boost::str(quicksvfmt % ir->getBarcode() % ea->getZipCode() % ea->getTown() % ea->getStreetName() % ea->getHouseNumber() % ea->getSortRow() % ea->getSortBox() % ea->getString() % ir->getKundennummer() % ir->getKostenstelle());
   mutex.unlock();
 
-  std::string sql = "call quicksv";//("+"'"+ir->getBarcode()+"',"+"'"+ea->getZipCode()+"',"+"'"+ea->getTown()+"',"+"'"+ea->getStreetName()+"',"+"'"+ea->getHouseNumber()+"',"+"'"+ea->getZipCode()+"',"+"'"+ea->getSortRow()+"',"+"'"+ea->getSortBox()+"',"+"'"+ea->getString()+"',"+"'kundennummmer!!!'"+")";
+
+
+  if (mysql_query(con, sql.c_str())){
+    fprintf(stderr, "%s\n", mysql_error(con));
+  }
+
+  cv::Mat im = ir->getResultImage();
+  std::string prefix = "";
+  std::vector<int> params;
+  std::string code = ir->getBarcode();
+  if (code==""){
+    // no code
+    prefix = "nocode";
+    struct timeval ts;
+    gettimeofday(&ts,NULL);
+    boost::format cfmt = boost::format("%012d.%06d") % ts.tv_sec % ts.tv_usec;
+    code = cfmt.str();
+    im = ir->getOriginalImage();
+  }else if(ea->foundAddress()){
+    prefix = "good";
+    params.push_back(CV_IMWRITE_JPEG_QUALITY);
+    params.push_back(80);
+  }else{
+    prefix = "noaddress";
+    im = ir->getOriginalImage();
+    params.push_back(CV_IMWRITE_JPEG_QUALITY);
+    params.push_back(80);
+  }
+  boost::format fmt = boost::format("%s%s%s.%s.jpg") % getResultImagePath() % prefix % code;
+  std::string fname = fmt.str();
+  cv::imwrite(fname.c_str(),im,params);
+  mutex.lock();
+  std::cout << fname << std::endl;
+  mutex.unlock();
 
 
 
@@ -121,7 +177,7 @@ void Grabber::setResultImagePath(std::string value){
   resultPath= value;
 }
 std::string Grabber::getResultImagePath(){
-  return storePath;
+  return resultPath;
 }
 
 std::string Grabber::getFileName(){
