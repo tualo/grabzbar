@@ -100,7 +100,7 @@ std::cout << "ocrthread rows (2) " << img.rows << std::endl;
     cfile.close();
   }
 
-  std::cout << "ocrthread rows (3) " << img.rows << orignalImage.cols << std::endl;
+  std::cout << "ocrthread rows (3) " << img.rows << img.cols << std::endl;
 
   std::vector<std::string> kstrs;
   boost::split(kstrs,customer,boost::is_any_of("|"));
