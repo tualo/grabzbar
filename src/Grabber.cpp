@@ -37,8 +37,8 @@ void Grabber::ocrthread(cv::Mat img) {
   mutex.unlock();
 
   boost::format tempfmt = boost::format("%s%s.%s.%s.jpg") % getResultImagePath() % "buff" % ts.tv_sec % ts.tv_usec;
-  std::string tempfname = temp.str();
-  cv::imwrite(tempfname.c_str(),im);
+  std::string tempfname = tempfmt.str();
+  cv::imwrite(tempfname.c_str(),img);
 
   MYSQL *con = mysql_init(NULL);
 //str_db_encoding.c_str()
