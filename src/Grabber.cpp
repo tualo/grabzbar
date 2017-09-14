@@ -36,7 +36,9 @@ void Grabber::ocrthread(cv::Mat img) {
   runningTasks++;
   mutex.unlock();
 
-
+  boost::format tempfmt = boost::format("%s%s.%s.%s.jpg") % getResultImagePath() % "buff" % ts.tv_sec % ts.tv_usec;
+  std::string tempfname = temp.str();
+  cv::imwrite(tempfname.c_str(),im);
 
   MYSQL *con = mysql_init(NULL);
 //str_db_encoding.c_str()
@@ -98,7 +100,7 @@ std::cout << "ocrthread rows (2) " << img.rows << std::endl;
     cfile.close();
   }
 
-  std::cout << "ocrthread rows (3) " << img.rows << std::endl;
+  std::cout << "ocrthread rows (3) " << img.rows << orignalImage.cols << std::endl;
 
   std::vector<std::string> kstrs;
   boost::split(kstrs,customer,boost::is_any_of("|"));
