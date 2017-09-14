@@ -38,7 +38,7 @@ void Grabber::ocrthread(cv::Mat img) {
 
   struct timeval tsx;
   gettimeofday(&tsx,NULL);
-  boost::format tempfmt = boost::format("%s%s.%s.%s.jpg") % getResultImagePath() % "buff" % tsx.tv_sec % tsx.tv_usec;
+  boost::format tempfmt = boost::format("%s%s.%s.%s.jpg.temp") % getResultImagePath() % "buff" % tsx.tv_sec % tsx.tv_usec;
   std::string tempfname = tempfmt.str();
   cv::imwrite(tempfname.c_str(),img);
 
@@ -76,11 +76,9 @@ void Grabber::ocrthread(cv::Mat img) {
     b_forceFPCode
   );
 
-std::cout << "ocrthread rows (1) " << img.rows << std::endl;
   std::string sql_user = "set @sessionuser='not set'";
   if (mysql_query(con, sql_user.c_str())){
   }
-std::cout << "ocrthread rows (2) " << img.rows << std::endl;
   std::string sql_modell = "set @svmodell='Maschine'";
   if (mysql_query(con, sql_modell.c_str())){
   }
@@ -102,7 +100,6 @@ std::cout << "ocrthread rows (2) " << img.rows << std::endl;
     cfile.close();
   }
 
-  std::cout << "ocrthread rows (3) " << img.rows << img.cols << std::endl;
 
   std::vector<std::string> kstrs;
   boost::split(kstrs,customer,boost::is_any_of("|"));
@@ -111,23 +108,12 @@ std::cout << "ocrthread rows (2) " << img.rows << std::endl;
     ir->setKostenstelle(kstrs[1]);
   }
 
-  std::cout << "ocrthread rows (3.1) " << img.rows << std::endl;
-
-
   ir->setPixelPerCM(int_pixel_cm_x,int_pixel_cm_y);
-  std::cout << "ocrthread rows (3.2) " << img.rows << std::endl;
   ir->setImage(img);
-  std::cout << "ocrthread rows (3.3) " << img.rows << std::endl;
   ir->rescale();
-  std::cout << "ocrthread rows (3.4) " << img.rows << std::endl;
   ir->barcode();
-  std::cout << "ocrthread rows (3.5) " << img.rows << std::endl;
   ir->correctSize();
-  std::cout << "ocrthread rows (3.6) " << img.rows << std::endl;
   ir->largestContour(false);
-  std::cout << "ocrthread rows (3.7) " << img.rows << std::endl;
-
-  std::cout << "ocrthread rows (4) " << img.rows << std::endl;
   ExtractAddress* ea = ir->texts();
 
 
@@ -137,11 +123,7 @@ std::cout << "ocrthread rows (2) " << img.rows << std::endl;
   }else{
     std::cout << "No ZipCode " << std::endl;
   }
-
   std::string sql = boost::str(quicksvfmt % ir->getBarcode() % ea->getZipCode() % ea->getTown() % ea->getStreetName() % ea->getHouseNumber() % ea->getSortRow() % ea->getSortBox() % ea->getString() % ir->getKundennummer() % ir->getKostenstelle());
-
-  std::cout << "ocrthread rows (5) " << img.rows << std::endl;
-  std::cout << "SQL " << sql << std::endl;
   mutex.unlock();
 
   if (mysql_query(con, sql.c_str())){
@@ -153,7 +135,6 @@ std::cout << "ocrthread rows (2) " << img.rows << std::endl;
   std::vector<int> params;
   std::string code = ir->getBarcode();
 
-  std::cout << "ocrthread rows (5.1) " << img.rows << std::endl;
   if (code==""){
     // no code
     prefix = "nocode";
@@ -198,9 +179,16 @@ std::cout << "ocrthread rows (2) " << img.rows << std::endl;
 
   runningTasks--;
   mutex.unlock();
+
+
+  std::remove(tempfname.c_str()); // delete file
+
 }
 
 
+void   Grabber::beep(){
+  std::cout << '\a' << '\7' << std::endl;
+}
 
 void Grabber::setStoreImagePath(std::string value){
   storePath = value;
@@ -417,7 +405,7 @@ void Grabber::run_capture(){
 
       if(camera.PixelFormat.GetValue() == PixelFormat_Mono8){
         totalImageSize = camera.Width.GetValue()*_maxImageHeight;
-        currentImage = cv::Mat(_maxImageHeight, camera.Width.GetValue(), CV_8UC1, cv::Scalar(0));
+        currentImage = cv::Mat(_maxImageHeight+600, camera.Width.GetValue(), CV_8UC1, cv::Scalar(0));
       }else{
 
       }
@@ -508,11 +496,14 @@ void Grabber::run_capture(){
             if (inimage){
               grabbedImageSize = ptrGrabResult->GetWidth()*ptrGrabResult->GetHeight();
               mutex.lock();
-              std::memcpy(
-                currentImage.ptr()+(currentHeight*ptrGrabResult->GetWidth()),
-                ptrGrabResult->GetBuffer(),
-                grabbedImageSize
-              );
+              if (currentHeight<_maxImageHeight){
+                std::memcpy(
+                  currentImage.ptr()+(currentHeight*ptrGrabResult->GetWidth()),
+                  ptrGrabResult->GetBuffer(),
+                  grabbedImageSize
+                );
+
+              }
               mutex.unlock();
 
               /*
@@ -521,6 +512,9 @@ void Grabber::run_capture(){
               */
               currentHeight += ptrGrabResult->GetHeight();
               if (currentHeight>_maxImageHeight){
+                beep();
+                beep();
+                
                 mutex.lock();
                 std::cerr << "image larger than max size (" << _maxImageHeight << ")" << std::endl;
                 std::cerr << "stopping bbs service" << std::endl;
@@ -550,6 +544,7 @@ void Grabber::run_capture(){
         << e.what() << std::endl;
         mutex.unlock();
       }
+      beep();
     }
 
     // wait for at 3.5 secs, see basler specs

@@ -42,7 +42,7 @@ public:
   ~Grabber();
 
   void run();
-
+  void beep();
   void setStoreImagePath(std::string value);
   std::string getStoreImagePath();
   void setResultImagePath(std::string value);
