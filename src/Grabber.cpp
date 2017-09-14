@@ -72,11 +72,11 @@ void Grabber::ocrthread(cv::Mat img) {
     b_forceFPCode
   );
 
-std::cout << "ocrthread rows" << img.rows << std::endl;
+std::cout << "ocrthread rows (1) " << img.rows << std::endl;
   std::string sql_user = "set @sessionuser='not set'";
   if (mysql_query(con, sql_user.c_str())){
   }
-std::cout << "ocrthread rows" << img.rows << std::endl;
+std::cout << "ocrthread rows (2) " << img.rows << std::endl;
   std::string sql_modell = "set @svmodell='Maschine'";
   if (mysql_query(con, sql_modell.c_str())){
   }
@@ -98,7 +98,7 @@ std::cout << "ocrthread rows" << img.rows << std::endl;
     cfile.close();
   }
 
-  std::cout << "ocrthread rows 3" << img.rows << std::endl;
+  std::cout << "ocrthread rows (3) " << img.rows << std::endl;
 
   std::vector<std::string> kstrs;
   boost::split(kstrs,customer,boost::is_any_of("|"));
@@ -114,7 +114,7 @@ std::cout << "ocrthread rows" << img.rows << std::endl;
   ir->correctSize();
   ir->largestContour(false);
 
-  std::cout << "ocrthread rows 4" << img.rows << std::endl;
+  std::cout << "ocrthread rows (4) " << img.rows << std::endl;
   ExtractAddress* ea = ir->texts();
 
 
@@ -128,6 +128,7 @@ std::cout << "ocrthread rows" << img.rows << std::endl;
   std::string sql = boost::str(quicksvfmt % ir->getBarcode() % ea->getZipCode() % ea->getTown() % ea->getStreetName() % ea->getHouseNumber() % ea->getSortRow() % ea->getSortBox() % ea->getString() % ir->getKundennummer() % ir->getKostenstelle());
   mutex.unlock();
 
+  std::cout << "ocrthread rows (5) " << img.rows << std::endl;
 
 
   if (mysql_query(con, sql.c_str())){
