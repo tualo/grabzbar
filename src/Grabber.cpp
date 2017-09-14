@@ -148,6 +148,8 @@ std::cout << "ocrthread rows (2) " << img.rows << std::endl;
   std::string prefix = "";
   std::vector<int> params;
   std::string code = ir->getBarcode();
+
+  std::cout << "ocrthread rows (5.1) " << img.rows << std::endl;
   if (code==""){
     // no code
     prefix = "nocode";
@@ -166,7 +168,7 @@ std::cout << "ocrthread rows (2) " << img.rows << std::endl;
     params.push_back(CV_IMWRITE_JPEG_QUALITY);
     params.push_back(80);
   }
-  boost::format fmt = boost::format("%s%s%s.%s.jpg") % getResultImagePath() % prefix % code;
+  boost::format fmt = boost::format("%s%s.%s.jpg") % getResultImagePath() % prefix % code;
   std::string fname = fmt.str();
   mutex.lock();
   std::cout << fname << std::endl;
