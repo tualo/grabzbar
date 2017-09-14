@@ -139,10 +139,10 @@ std::cout << "ocrthread rows (2) " << img.rows << std::endl;
   }
 
   std::string sql = boost::str(quicksvfmt % ir->getBarcode() % ea->getZipCode() % ea->getTown() % ea->getStreetName() % ea->getHouseNumber() % ea->getSortRow() % ea->getSortBox() % ea->getString() % ir->getKundennummer() % ir->getKostenstelle());
-  mutex.unlock();
 
   std::cout << "ocrthread rows (5) " << img.rows << std::endl;
-
+  std::cout << "SQL " << sql << std::endl;
+  mutex.unlock();
 
   if (mysql_query(con, sql.c_str())){
     fprintf(stderr, "%s\n", mysql_error(con));
