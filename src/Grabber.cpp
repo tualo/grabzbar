@@ -1,6 +1,6 @@
 #include "Grabber.h"
 
-boost::format quicksvfmt("call quicksv('%s','%s','%s','%s','%s', '%s','%s','%s','%s','%s' ");
+boost::format quicksvfmt("call quicksv('%s','%s','%s','%s','%s', '%s','%s','%s','%s','%s') ");
 
 Grabber::Grabber():
   runningTasks(0),
