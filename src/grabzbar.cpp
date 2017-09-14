@@ -37,7 +37,7 @@ const char* str_db_encoding = "utf8";
 
 int int_pixel_cm_x = 73;
 int int_pixel_cm_y = 73;
-int blockSize=55;
+int int_blockSize=55;
 int subtractMean=20;
 
 
@@ -153,7 +153,7 @@ int main(int argc, char* argv[])
 
     // ### Ocrs
 
-    if (blocksize) { blockSize = args::get(blocksize); }
+    if (blocksize) { int_blockSize = args::get(blocksize); }
     if (substractmean) { subtractMean = args::get(substractmean); }
     if (pixel_cm_x) { int_pixel_cm_x = args::get(pixel_cm_x); }
     if (pixel_cm_y) { int_pixel_cm_y = args::get(pixel_cm_y); }
@@ -175,7 +175,7 @@ int main(int argc, char* argv[])
     grabber->configOCR(
       debug==1,
       debugtime==1,
-      blocksize,
+      int_blockSize,
       substractmean,
       pixel_cm_x,
       pixel_cm_y,
