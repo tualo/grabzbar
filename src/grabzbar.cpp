@@ -114,6 +114,7 @@ int main(int argc, char* argv[])
     args::ValueFlag<int> pixel_cm_y(parser, "cm_y", "Pixel per CM Y (default 73)", {"cmy"});
     args::ValueFlag<int> blocksize(parser, "blocksize", "adaptiveThreshold Blocksize (default 55)", {"blocksize"});
     args::ValueFlag<int> substractmean(parser, "substractmean", "adaptiveThreshold subtractMean (default 20)", {"substractmean"});
+    args::ValueFlag<float> meanfactor(parser, "meanfactor", " meanfactor (default 0.8)", {"meanfactor"});
     args::Flag calculatemean(parser, "calculatemean", "calculatemean (default off)", {"calculatemean"});
     args::ValueFlag<std::string> machine(parser, "machine", "The machine ID", {"machine"});
 
@@ -133,7 +134,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-
+    float float_meanfaktor=0.8;
 
     int int_exposure = 1300;
     if (exposure) { int_exposure = args::get(exposure); }
@@ -162,6 +163,7 @@ int main(int argc, char* argv[])
 
     if (blocksize) { int_blockSize = args::get(blocksize); }
     if (substractmean) { int_subtractMean = args::get(substractmean); }
+    if (meanfactor) { float_meanfaktor = args::get(meanfactor); }
     if (pixel_cm_x) { int_pixel_cm_x = args::get(pixel_cm_x); }
     if (pixel_cm_y) { int_pixel_cm_y = args::get(pixel_cm_y); }
 
@@ -190,7 +192,8 @@ int main(int argc, char* argv[])
       bc_clahe==1,
       int_bc_thres_start,
       int_bc_thres_stop,
-      int_bc_thres_step
+      int_bc_thres_step,
+      float_meanfaktor
     );
     grabber->configCamera(
       int_exposure,

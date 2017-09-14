@@ -78,7 +78,8 @@ public:
     bool bc_clahe,
     int bc_thres_start,
     int bc_thres_stop,
-    int bc_thres_step
+    int bc_thres_step,
+    float float_meanfaktor
   );
 private:
   int runningTasks;

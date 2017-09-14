@@ -293,7 +293,8 @@ void Grabber::configOCR(
   bool bc_clahe,
   int bc_thres_start,
   int bc_thres_stop,
-  int bc_thres_step
+  int bc_thres_step,
+  float float_meanfaktor
 ){
   b_debug=debug;
   b_debugtime=debugtime;
@@ -306,6 +307,7 @@ void Grabber::configOCR(
   i_bc_thres_start=bc_thres_start;
   i_bc_thres_stop=bc_thres_stop;
   i_bc_thres_step=bc_thres_step;
+  f_meanfactor=float_meanfaktor;
 }
 
 void Grabber::run_capture(){
