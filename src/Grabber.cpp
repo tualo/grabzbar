@@ -30,20 +30,33 @@ bool Grabber::canStartTask(){
 
 
 void Grabber::ocrthread(cv::Mat img) {
+  std::cout << "ocrthread rows" << img.rows << std::endl;
+
   mutex.lock();
   runningTasks++;
   mutex.unlock();
 
 
-  MYSQL *con = nullptr;
+
+  MYSQL *con = mysql_init(NULL);
+//str_db_encoding.c_str()
+  mysql_options(con, MYSQL_SET_CHARSET_NAME, "utf8");
+  mysql_options(con, MYSQL_INIT_COMMAND, "SET NAMES utf8");
+
+  if (con == NULL){
+    fprintf(stderr, "%s\n", mysql_error(con));
+    exit(1);
+  }
+
+  if (mysql_real_connect(con, str_db_host.c_str(),str_db_user.c_str(), str_db_password.c_str(),   str_db_name.c_str(), 0, NULL, 0) == NULL){
+    fprintf(stderr, "%s\n", mysql_error(con));
+    mysql_close(con);
+    exit(1);
+  }
+
   ImageRecognizeEx* ir = ocr_ext(
     con,
     str_machine,
-    str_db_host.c_str(),
-    str_db_user.c_str(),
-    str_db_name.c_str(),
-    str_db_password.c_str(),
-    str_db_encoding.c_str(),
     i_blockSize,
     i_substractMean,
     b_debugtime,
@@ -59,10 +72,11 @@ void Grabber::ocrthread(cv::Mat img) {
     b_forceFPCode
   );
 
+std::cout << "ocrthread rows" << img.rows << std::endl;
   std::string sql_user = "set @sessionuser='not set'";
   if (mysql_query(con, sql_user.c_str())){
   }
-
+std::cout << "ocrthread rows" << img.rows << std::endl;
   std::string sql_modell = "set @svmodell='Maschine'";
   if (mysql_query(con, sql_modell.c_str())){
   }
@@ -83,6 +97,9 @@ void Grabber::ocrthread(cv::Mat img) {
     }
     cfile.close();
   }
+
+  std::cout << "ocrthread rows 3" << img.rows << std::endl;
+
   std::vector<std::string> kstrs;
   boost::split(kstrs,customer,boost::is_any_of("|"));
   if (kstrs.size()==2){
@@ -96,6 +113,8 @@ void Grabber::ocrthread(cv::Mat img) {
   ir->barcode();
   ir->correctSize();
   ir->largestContour(false);
+
+  std::cout << "ocrthread rows 4" << img.rows << std::endl;
   ExtractAddress* ea = ir->texts();
 
 
@@ -207,9 +226,11 @@ void Grabber::run(){
 }
 
 void Grabber::startocr(cv::Mat img){
+  std::cout << "startocr rows" << img.rows << " can start " <<  canStartTask() << std::endl;
   if (canStartTask()){
     boost::thread* thr = new boost::thread(&Grabber::ocrthread, this , img);
   }else{
+    std::cout << "saving rows" << img.rows << std::endl;
     cv::imwrite((getFileName()).c_str(),img);
   }
 }
@@ -448,6 +469,7 @@ void Grabber::run_capture(){
               if (currentAVG<=stopAVG){
                 // the letter has ended
                 mutex.lock();
+                std::cout << "image height: " << currentHeight << std::endl;
                 cv::Rect myROI(0, 0, currentImage.cols, currentHeight);
                 cv::Mat result = currentImage(myROI);
                 mutex.unlock();
