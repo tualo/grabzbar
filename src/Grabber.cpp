@@ -31,6 +31,8 @@ bool Grabber::canStartTask(){
 
 void Grabber::ocrthread(cv::Mat img) {
   std::cout << "ocrthread debug " << b_debug << std::endl;
+  double _start_time = (double)cv::getTickCount();
+
 
   mutex.lock();
   runningTasks++;
@@ -166,6 +168,7 @@ void Grabber::ocrthread(cv::Mat img) {
   mysql_close(con);
   mutex.lock();
 
+  double _since_start = ( ((double)cv::getTickCount() - _start_time)/cv::getTickFrequency() );
   std::cout << "#########################################" << std::endl;
   std::cout << "code: " << ir->getBarcode() << std::endl;
   std::cout << "zipcode: " << ea->getZipCode() << std::endl;
@@ -174,6 +177,7 @@ void Grabber::ocrthread(cv::Mat img) {
   std::cout << "housenumber: " << ea->getHouseNumber() << std::endl;
   std::cout << "sortiergang: " << ea->getSortRow() << std::endl;
   std::cout << "sortierfach: " << ea->getSortBox() << std::endl;
+  std::cout << "zeit: " << _since_start << "s" << std::endl;
   std::cout << "#########################################" << std::endl;
 
 
@@ -514,7 +518,7 @@ void Grabber::run_capture(){
               if (currentHeight>_maxImageHeight){
                 beep();
                 beep();
-                
+
                 mutex.lock();
                 std::cerr << "image larger than max size (" << _maxImageHeight << ")" << std::endl;
                 std::cerr << "stopping bbs service" << std::endl;

@@ -1,3 +1,5 @@
 *.o
 grabzbar
 src/grabzbar.cpp.bak
+a.out
+relay
