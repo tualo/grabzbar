@@ -26,6 +26,8 @@
 
 
 std::string std_str_machine="0";
+std::string std_str_storepath="/tmp/";
+std::string std_str_resultpath="/tmp/";
 
 const char* str_db_host = "localhost";
 const char* str_db_user = "root";
@@ -116,6 +118,10 @@ int main(int argc, char* argv[])
     args::ValueFlag<std::string> machine(parser, "machine", "The machine ID", {"machine"});
 
 
+    args::ValueFlag<std::string> arg_resultpath(parser, "resultpath", "The resultpath (default /tmp/)", {"resultpath"});
+    args::ValueFlag<std::string> arg_storepath(parser, "storepath", "The storepath (default /tmp/)", {"storepath"});
+
+
     try{
         parser.ParseCLI(argc, argv);
     }catch (args::Help){
@@ -159,10 +165,13 @@ int main(int argc, char* argv[])
     if (db_pass){ str_db_password= (args::get(db_pass)).c_str(); }
     if (machine){ std_str_machine=args::get(machine); }
 
+    if (arg_resultpath){ std_str_resultpath=args::get(arg_resultpath); }
+    if (arg_storepath){ std_str_storepath=args::get(arg_storepath); }
 
     // --- Ocrs
     Grabber *grabber=new Grabber();
-
+    grabber->setResultImagePath(std_str_resultpath)
+    grabber->setStoreImagePath(std_str_storepath);
     grabber->configOCR(
       debug==1,
       debugtime==1,

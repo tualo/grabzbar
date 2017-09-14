@@ -139,10 +139,11 @@ void Grabber::ocrthread(cv::Mat img) {
   }
   boost::format fmt = boost::format("%s%s%s.%s.jpg") % getResultImagePath() % prefix % code;
   std::string fname = fmt.str();
-  cv::imwrite(fname.c_str(),im,params);
   mutex.lock();
   std::cout << fname << std::endl;
   mutex.unlock();
+  cv::imwrite(fname.c_str(),im,params);
+
 
 
 
