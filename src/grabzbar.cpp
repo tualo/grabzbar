@@ -170,7 +170,7 @@ int main(int argc, char* argv[])
 
     // --- Ocrs
     Grabber *grabber=new Grabber();
-    grabber->setResultImagePath(std_str_resultpath)
+    grabber->setResultImagePath(std_str_resultpath);
     grabber->setStoreImagePath(std_str_storepath);
     grabber->configOCR(
       debug==1,
