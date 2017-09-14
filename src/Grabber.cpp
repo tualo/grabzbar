@@ -30,7 +30,7 @@ bool Grabber::canStartTask(){
 
 
 void Grabber::ocrthread(cv::Mat img) {
-  std::cout << "ocrthread rows" << img.rows << std::endl;
+  std::cout << "ocrthread debug " << b_debug << std::endl;
 
   mutex.lock();
   runningTasks++;
@@ -107,12 +107,21 @@ std::cout << "ocrthread rows (2) " << img.rows << std::endl;
     ir->setKostenstelle(kstrs[1]);
   }
 
+  std::cout << "ocrthread rows (3.1) " << img.rows << std::endl;
+
+
   ir->setPixelPerCM(int_pixel_cm_x,int_pixel_cm_y);
+  std::cout << "ocrthread rows (3.2) " << img.rows << std::endl;
   ir->setImage(img);
+  std::cout << "ocrthread rows (3.3) " << img.rows << std::endl;
   ir->rescale();
+  std::cout << "ocrthread rows (3.4) " << img.rows << std::endl;
   ir->barcode();
+  std::cout << "ocrthread rows (3.5) " << img.rows << std::endl;
   ir->correctSize();
+  std::cout << "ocrthread rows (3.6) " << img.rows << std::endl;
   ir->largestContour(false);
+  std::cout << "ocrthread rows (3.7) " << img.rows << std::endl;
 
   std::cout << "ocrthread rows (4) " << img.rows << std::endl;
   ExtractAddress* ea = ir->texts();
