@@ -38,7 +38,7 @@ const char* str_db_encoding = "utf8";
 int int_pixel_cm_x = 73;
 int int_pixel_cm_y = 73;
 int int_blockSize=55;
-int subtractMean=20;
+int int_subtractMean=20;
 
 
 // --- Ocrs
@@ -149,12 +149,19 @@ int main(int argc, char* argv[])
 
 
 
+    int int_bc_thres_start = 60;
+    if (bc_thres_start) { int_bc_thres_start = args::get(bc_thres_start); }
+    int int_bc_thres_stop = 160;
+    if (int_bc_thres_stop) { int_bc_thres_stop = args::get(bc_thres_stop); }
+    int int_bc_thres_step = 20;
+    if (bc_thres_step) { int_bc_thres_step = args::get(bc_thres_step); }
+
 
 
     // ### Ocrs
 
     if (blocksize) { int_blockSize = args::get(blocksize); }
-    if (substractmean) { subtractMean = args::get(substractmean); }
+    if (substractmean) { int_subtractMean = args::get(substractmean); }
     if (pixel_cm_x) { int_pixel_cm_x = args::get(pixel_cm_x); }
     if (pixel_cm_y) { int_pixel_cm_y = args::get(pixel_cm_y); }
 
@@ -176,14 +183,14 @@ int main(int argc, char* argv[])
       debug==1,
       debugtime==1,
       int_blockSize,
-      substractmean,
-      pixel_cm_x,
-      pixel_cm_y,
-      calculatemean,
-      bc_clahe,
-      bc_thres_start,
-      bc_thres_stop,
-      bc_thres_step
+      int_subtractMean,
+      int_pixel_cm_x,
+      int_pixel_cm_y,
+      calculatemean==1,
+      bc_clahe==1,
+      int_bc_thres_start,
+      int_bc_thres_stop,
+      int_bc_thres_step
     );
     grabber->configCamera(
       int_exposure,
