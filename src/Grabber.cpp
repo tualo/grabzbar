@@ -181,7 +181,7 @@ void Grabber::ocrthread(cv::Mat img) {
   std::cout << "#########################################" << std::endl;
 
   int system_result;
-  system_result = system( "echo \"curl -u admin:password http://192.168.192.244/io.cgi?DOA1=3\" | at now" );
+  system_result = system( "curl -u admin:password \"http://192.168.192.244/io.cgi?DOA1=3\"" );
 
 
   runningTasks--;
