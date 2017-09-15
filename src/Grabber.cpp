@@ -38,12 +38,13 @@ void Grabber::ocrthread(cv::Mat img) {
   runningTasks++;
   mutex.unlock();
 
+/*
   struct timeval tsx;
   gettimeofday(&tsx,NULL);
   boost::format tempfmt = boost::format("%s%s.%s.%s.jpeg") % getResultImagePath() % "buff" % tsx.tv_sec % tsx.tv_usec;
   std::string tempfname = tempfmt.str();
   cv::imwrite(tempfname.c_str(),img);
-
+*/
   MYSQL *con = mysql_init(NULL);
 //str_db_encoding.c_str()
   mysql_options(con, MYSQL_SET_CHARSET_NAME, "utf8");
@@ -160,8 +161,6 @@ void Grabber::ocrthread(cv::Mat img) {
   mutex.lock();
   std::cout << fname << std::endl;
   mutex.unlock();
-  cv::imwrite(fname.c_str(),im,params);
-
 
 
 
@@ -182,6 +181,9 @@ void Grabber::ocrthread(cv::Mat img) {
 
   int system_result;
   system_result = system( "curl -u admin:password \"http://192.168.192.244/io.cgi?DOA1=3\"" );
+  
+  cv::imwrite(fname.c_str(),im,params);
+
 
 
   runningTasks--;
