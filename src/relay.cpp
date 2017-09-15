@@ -18,10 +18,18 @@ int main(int argc, char *argv[])
     int sockfd, portno, n;
     struct sockaddr_in serv_addr;
     struct hostent *server;
+    char state = 0x20;
+    if (argc < 5) {
+      fprintf(stdout,"usage %s ip password relay time(in ms) [state]\n", argv[0]);
+      fprintf(stdout,"\tstate can be 1 (default) for or 0 for off\n");
 
-    if (argc < 4) {
-       fprintf(stderr,"usage %s ip password relay time(in ms)\n", argv[0]);
        exit(0);
+    }
+
+    if (argc > 5) {
+      if (atoi(argv[5])){
+        state = 0x21;
+      }
     }
     //portno = atoi(argv[2]);
     portno = 17494;
@@ -39,7 +47,7 @@ int main(int argc, char *argv[])
     logoutbuffer[0]=0x7b;
 
     char relaybuffer[3];
-    relaybuffer[0]=0x20;
+    relaybuffer[0]=state;
     relaybuffer[1]=(char)(atoi(argv[3]));
     relaybuffer[2]=(char)(atoi(argv[4])/100);
 
