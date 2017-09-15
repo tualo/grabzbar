@@ -40,7 +40,7 @@ void Grabber::ocrthread(cv::Mat img) {
 
   struct timeval tsx;
   gettimeofday(&tsx,NULL);
-  boost::format tempfmt = boost::format("%s%s.%s.%s.jpg.temp") % getResultImagePath() % "buff" % tsx.tv_sec % tsx.tv_usec;
+  boost::format tempfmt = boost::format("%s%s.%s.%s.jpeg") % getResultImagePath() % "buff" % tsx.tv_sec % tsx.tv_usec;
   std::string tempfname = tempfmt.str();
   cv::imwrite(tempfname.c_str(),img);
 
