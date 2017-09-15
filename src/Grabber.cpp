@@ -168,7 +168,7 @@ void Grabber::ocrthread(cv::Mat img) {
 
 
 
-  mysql_close(con);
+//  mysql_close(con);
   mutex.lock();
 
   double _since_start = ( ((double)cv::getTickCount() - _start_time)/cv::getTickFrequency() );
