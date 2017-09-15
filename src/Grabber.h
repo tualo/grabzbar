@@ -48,6 +48,7 @@ public:
   void setResultImagePath(std::string value);
   std::string getResultImagePath();
   std::string getFileName();
+  void dbConnect();
 
 
 
@@ -142,6 +143,8 @@ private:
 
   boost::mutex mutex;
 
+
+  MYSQL *con;
 
 };
 #endif

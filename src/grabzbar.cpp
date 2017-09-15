@@ -211,6 +211,7 @@ int main(int argc, char* argv[])
       str_db_password,
       str_db_encoding
     );
+    grabber->dbConnect();
 
     boost::thread* thr = new boost::thread(&Grabber::run, grabber );
     thr->join();

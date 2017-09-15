@@ -28,6 +28,24 @@ bool Grabber::canStartTask(){
 }
 
 
+void Grabber::dbConnect(){
+
+  con = mysql_init(NULL);
+  //str_db_encoding.c_str()
+  mysql_options(con, MYSQL_SET_CHARSET_NAME, "utf8");
+  mysql_options(con, MYSQL_INIT_COMMAND, "SET NAMES utf8");
+
+  if (con == NULL){
+    fprintf(stderr, "%s\n", mysql_error(con));
+    exit(1);
+  }
+
+  if (mysql_real_connect(con, str_db_host.c_str(),str_db_user.c_str(), str_db_password.c_str(),   str_db_name.c_str(), 0, NULL, 0) == NULL){
+    fprintf(stderr, "%s\n", mysql_error(con));
+    mysql_close(con);
+    exit(1);
+  }
+}
 
 void Grabber::ocrthread(cv::Mat img) {
   std::cout << "ocrthread debug " << b_debug << std::endl;
@@ -45,21 +63,7 @@ void Grabber::ocrthread(cv::Mat img) {
   std::string tempfname = tempfmt.str();
   cv::imwrite(tempfname.c_str(),img);
 */
-  MYSQL *con = mysql_init(NULL);
-//str_db_encoding.c_str()
-  mysql_options(con, MYSQL_SET_CHARSET_NAME, "utf8");
-  mysql_options(con, MYSQL_INIT_COMMAND, "SET NAMES utf8");
 
-  if (con == NULL){
-    fprintf(stderr, "%s\n", mysql_error(con));
-    exit(1);
-  }
-
-  if (mysql_real_connect(con, str_db_host.c_str(),str_db_user.c_str(), str_db_password.c_str(),   str_db_name.c_str(), 0, NULL, 0) == NULL){
-    fprintf(stderr, "%s\n", mysql_error(con));
-    mysql_close(con);
-    exit(1);
-  }
 
   ImageRecognizeEx* ir = ocr_ext(
     con,
