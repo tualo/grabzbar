@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
     bzero(responsebuffer,255);
     n = read(sockfd,responsebuffer,255);
     if (n < 0)  error("ERROR reading from socket");
-    printf("one means pw ok %s\n",responsebuffer);
+    printf("one means pw ok %i\n",responsebuffer[0]);
 
     // send the relay message
     n = write(sockfd,relaybuffer,strlen(relaybuffer));
