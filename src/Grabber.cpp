@@ -185,13 +185,14 @@ void Grabber::ocrthread(cv::Mat img) {
 
   int system_result;
   system_result = system( "curl -u admin:password \"http://192.168.192.244/io.cgi?DOA1=3\"" );
-
-  cv::imwrite(fname.c_str(),im,params);
+  std::cout << "#########################################" << std::endl;
 
 
 
   runningTasks--;
   mutex.unlock();
+  cv::imwrite(fname.c_str(),im,params);
+
 
 
   //std::remove(tempfname.c_str()); // delete file
