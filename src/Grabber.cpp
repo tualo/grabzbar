@@ -490,6 +490,7 @@ void Grabber::run_capture(){
                 // the letter has ended
                 mutex.lock();
                 std::cout << "image height: " << currentHeight << std::endl;
+
                 cv::Rect myROI(0, 0, currentImage.cols, currentHeight);
                 cv::Mat result = currentImage(myROI);
                 mutex.unlock();
