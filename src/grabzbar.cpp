@@ -167,6 +167,9 @@ int main(int argc, char* argv[])
     if (pixel_cm_x) { int_pixel_cm_x = args::get(pixel_cm_x); }
     if (pixel_cm_y) { int_pixel_cm_y = args::get(pixel_cm_y); }
 
+    std::cout << "args int_pixel_cm_x: " << int_pixel_cm_x << std::endl;
+    std::cout << "args int_pixel_cm_y: " << int_pixel_cm_y << std::endl;
+
     if (db_encoding){ str_db_encoding= (args::get(db_encoding)).c_str(); }
     if (db_host){ str_db_host= (args::get(db_host)).c_str(); }
     if (db_user){ str_db_user= (args::get(db_user)).c_str(); }
