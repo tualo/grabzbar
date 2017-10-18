@@ -613,12 +613,16 @@ void Grabber::run_streamer(){
       cv::Size textSize = cv::getTextSize(imgtext, fontFace, fontScale, thickness, &baseline);
       baseline += thickness;
       // center the text
+
       cv::Point textOrg((image.cols - textSize.width)/2, (image.rows + textSize.height)/2);
       cv::putText(image, imgtext, textOrg, fontFace, fontScale,   cv::Scalar::all(255), thickness, 8);
 
 
-
-      int n_viewers = stmr->post_image(image,quality, wait);
+      int x=src.cols /5;
+      int y=src.rows /5;
+      cv::Mat res = cv::Mat(x, y, CV_8UC1);
+      cv::resize(image, res, cv::Size(x, y), 0, 0, 3);
+      int n_viewers = stmr->post_image(res,quality, wait);
       //use boost sleep so that our loop doesn't go out of control.
       boost::this_thread::sleep(boost::posix_time::milliseconds(ms)); //30 FPS
     }
