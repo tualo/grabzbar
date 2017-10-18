@@ -9,8 +9,8 @@ Grabber::Grabber():
   glb_maxImageHeight(600),
   glb_grabBinning(1),
   glb_grabGain(800),
-  int_pixel_cm_x(73),
-  int_pixel_cm_y(73)
+  i_pixel_cm_x(73),
+  i_pixel_cm_y(73)
 {
   maxTasks = boost::thread::hardware_concurrency();
   avgStepSize = 10;
@@ -115,9 +115,9 @@ void Grabber::ocrthread(cv::Mat img) {
     ir->setKostenstelle(kstrs[1]);
   }
 
-  ir->setPixelPerCM(int_pixel_cm_x,int_pixel_cm_y);
-  std::cout << "ocrthread int_pixel_cm_x " << int_pixel_cm_x << std::endl;
-  std::cout << "ocrthread int_pixel_cm_y " << int_pixel_cm_y << std::endl;
+  ir->setPixelPerCM(i_pixel_cm_x,i_pixel_cm_y);
+  std::cout << "ocrthread i_pixel_cm_x " << i_pixel_cm_x << std::endl;
+  std::cout << "ocrthread i_pixel_cm_y " << i_pixel_cm_y << std::endl;
   ir->setImage(img);
   ir->rescale();
   std::cout << "rescale " << std::endl;
@@ -308,6 +308,7 @@ void Grabber::configOCR(
   i_substractMean=substractmean;
   i_pixel_cm_x=pixel_cm_x;
   i_pixel_cm_y=pixel_cm_y;
+
   b_calculatemean=calculatemean;
   b_bc_clahe=bc_clahe;
   i_bc_thres_start=bc_thres_start;

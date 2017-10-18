@@ -134,8 +134,6 @@ private:
   int glb_grabBinning;
   int glb_grabGain;
 
-  int int_pixel_cm_x;
-  int int_pixel_cm_y;
 
   float f_meanfactor;
 
