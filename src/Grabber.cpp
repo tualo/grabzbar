@@ -192,7 +192,7 @@ void Grabber::ocrthread(cv::Mat img) {
   std::cout << "#########################################" << std::endl;
   */
 
-
+  streamImage = ir->roiImage.clone();
   runningTasks--;
   mutex.unlock();
   cv::imwrite(fname.c_str(),im,params);
@@ -594,7 +594,7 @@ void Grabber::run_streamer(){
 
 
       mutex.lock();
-      cv::Mat image = currentImage.clone();
+      cv::Mat image = streamImage.clone();
       mutex.unlock();
 
       //fill image somehow here. from camera or something.

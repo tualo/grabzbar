@@ -138,6 +138,7 @@ private:
   float f_meanfactor;
 
   cv::Mat currentImage;
+  cv::Mat streamImage;
 
   boost::mutex mutex;
 
