@@ -186,10 +186,11 @@ void Grabber::ocrthread(cv::Mat img) {
   std::cout << "zeit: " << _since_start << "s" << std::endl;
   std::cout << "#########################################" << std::endl;
 
+  /*
   int system_result;
   system_result = system( "curl -u admin:password \"http://192.168.192.244/io.cgi?DOA1=3\"" );
   std::cout << "#########################################" << std::endl;
-
+  */
 
 
   runningTasks--;
