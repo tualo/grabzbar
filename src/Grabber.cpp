@@ -618,8 +618,8 @@ void Grabber::run_streamer(){
       cv::putText(image, imgtext, textOrg, fontFace, fontScale,   cv::Scalar::all(255), thickness, 8);
 
 
-      int x=src.cols /5;
-      int y=src.rows /5;
+      int x=image.cols /5;
+      int y=image.rows /5;
       cv::Mat res = cv::Mat(x, y, CV_8UC1);
       cv::resize(image, res, cv::Size(x, y), 0, 0, 3);
       int n_viewers = stmr->post_image(res,quality, wait);
