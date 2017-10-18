@@ -581,7 +581,7 @@ void Grabber::run_streamer(){
     boost::format frmt("No.: %1%");
 
     //this initializes the redirect behavor, and the /_all handlers
-    server_ptr s = init_streaming_server("0.0.0.0", "8080", doc_root, num_threads);
+    server_ptr s = init_streaming_server("0.0.0.0", "18080", doc_root, num_threads);
     streamer_ptr stmr(new streamer);//a stream per image, you can register any number of these.
     register_streamer(s, stmr, "/stream_0");
     s->start();
