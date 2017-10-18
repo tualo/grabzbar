@@ -116,8 +116,11 @@ void Grabber::ocrthread(cv::Mat img) {
   }
 
   ir->setPixelPerCM(int_pixel_cm_x,int_pixel_cm_y);
+  std::cout << "ocrthread int_pixel_cm_x " << int_pixel_cm_x << std::endl;
+  std::cout << "ocrthread int_pixel_cm_y " << int_pixel_cm_y << std::endl;
   ir->setImage(img);
   ir->rescale();
+  std::cout << "rescale " << std::endl;
   ir->barcode();
   ir->correctSize();
   ir->largestContour(false);
