@@ -146,6 +146,10 @@ void Grabber::ocrthread(cv::Mat img) {
   std::vector<int> params;
   std::string code = ir->getBarcode();
 
+  
+  std::cout << "ocrthread code " << code << std::endl;
+
+  /*
   if (code==""){
     // no code
     prefix = "nocode";
@@ -164,6 +168,7 @@ void Grabber::ocrthread(cv::Mat img) {
     params.push_back(CV_IMWRITE_JPEG_QUALITY);
     params.push_back(80);
   }
+  */
   boost::format fmt = boost::format("%s%s.%s.jpg") % getResultImagePath() % prefix % code;
   std::string fname = fmt.str();
   mutex.lock();
