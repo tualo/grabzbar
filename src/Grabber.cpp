@@ -127,7 +127,7 @@ void Grabber::ocrthread(cv::Mat img) {
   ir->largestContour(false);
 
 
-if (noocr==false){
+if (b_noocr==false){
   ExtractAddress* ea = ir->texts();
 
 
@@ -183,6 +183,7 @@ if (noocr==false){
 //  mysql_close(con);
   mutex.lock();
 
+if (b_noocr==false){
   double _since_start = ( ((double)cv::getTickCount() - _start_time)/cv::getTickFrequency() );
   std::cout << "#########################################" << std::endl;
   std::cout << "code: " << ir->getBarcode() << std::endl;
@@ -194,7 +195,7 @@ if (noocr==false){
   std::cout << "sortierfach: " << ea->getSortBox() << std::endl;
   std::cout << "zeit: " << _since_start << "s" << std::endl;
   std::cout << "#########################################" << std::endl;
-
+}
   /*
   int system_result;
   system_result = system( "curl -u admin:password \"http://192.168.192.244/io.cgi?DOA1=3\"" );
