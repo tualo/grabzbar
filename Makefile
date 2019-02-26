@@ -66,11 +66,11 @@ $(NAME).o: $(SOURCES) $(HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./mjpeg/mime_types.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./mjpeg/connection.cpp
 
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./ocrs/new/RegionOfInterest.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./ocrs/new/glob_posix.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./ocrs/new/ExtractAddress.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./ocrs/new/ImageRecognizeEx.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./ocrs/new/ocr_ext.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ../ocrs/new/RegionOfInterest.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ../ocrs/new/glob_posix.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ../ocrs/new/ExtractAddress.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ../ocrs/new/ImageRecognizeEx.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ../ocrs/new/ocr_ext.cpp
 
 
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./src/Grabber.cpp
