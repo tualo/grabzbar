@@ -82,6 +82,7 @@ void Grabber::ocrthread(cv::Mat img) {
     i_bc_thres_step,
     b_forceFPCode
   );
+  
 
   std::string sql_user = "set @sessionuser='not set'";
   if (mysql_query(con, sql_user.c_str())){
