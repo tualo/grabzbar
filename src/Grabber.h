@@ -25,9 +25,9 @@
 #include "../mjpeg/mjpeg_server.hpp"
 
 
-#include "../ocrs/new/ocr_ext.h"
-#include "../ocrs/new/ImageRecognizeEx.h"
-#include "../ocrs/new/glob_posix.h"
+#include "../../ocrs/new/ocr_ext.h"
+#include "../../ocrs/new/ImageRecognizeEx.h"
+#include "../../ocrs/new/glob_posix.h"
 
 
 
