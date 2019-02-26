@@ -66,23 +66,23 @@ void Grabber::ocrthread(cv::Mat img) {
 
 
   ImageRecognizeEx* ir = ocr_ext(
-    con,
-    str_machine,
-    i_blockSize,
-    i_substractMean,
-    b_debugtime,
-    b_debug,
-    false,//debugwindow==1
-    b_calculatemean,
-    "",
-    f_meanfactor,
-    b_bc_clahe,
-    i_bc_thres_start,
-    i_bc_thres_stop,
-    i_bc_thres_step,
-    b_forceFPCode
+    con,             // 1
+    str_machine,   // 2
+    i_blockSize,   // 3
+    i_substractMean,   // 4
+    b_debugtime,   // 5
+    b_debug,   // 6
+    false,//debugwindow==1   // 7
+    b_calculatemean,   // 8
+    "",   // 9
+    f_meanfactor,   // 10
+    b_bc_clahe,   // 111
+    i_bc_thres_start,   // 12
+    i_bc_thres_stop,   // 13
+    i_bc_thres_step,   // 14
+    b_forceFPCode       // 15
   );
-  
+
 
   std::string sql_user = "set @sessionuser='not set'";
   if (mysql_query(con, sql_user.c_str())){
