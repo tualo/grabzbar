@@ -126,6 +126,8 @@ void Grabber::ocrthread(cv::Mat img) {
   ir->correctSize();
   ir->largestContour(false);
 
+
+if (noocr==false){
   ExtractAddress* ea = ir->texts();
 
 
@@ -141,7 +143,7 @@ void Grabber::ocrthread(cv::Mat img) {
   if (mysql_query(con, sql.c_str())){
     fprintf(stderr, "%s\n", mysql_error(con));
   }
-
+}
   cv::Mat im = ir->getResultImage();
   std::string prefix = "";
   std::vector<int> params;
