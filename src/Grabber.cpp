@@ -126,9 +126,9 @@ void Grabber::ocrthread(cv::Mat img) {
   ir->correctSize();
   ir->largestContour(false);
 
-
+ExtractAddress* ea;
 if (b_noocr==false){
-  ExtractAddress* ea = ir->texts();
+  ea = ir->texts();
 
 
   mutex.lock();
