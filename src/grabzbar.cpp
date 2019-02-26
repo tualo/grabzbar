@@ -74,6 +74,7 @@ int main(int argc, char* argv[])
     args::ArgumentParser parser("Ocrs reconize barcodes live from camera.", "");
     args::HelpFlag help(parser, "help", "Display this help menu", { "help"});
     args::Flag debug(parser, "debug", "Show debug messages", {'d', "debug"});
+    args::Flag noocr(parser, "noocr", "disable ocr", {'o', "noocr"});
     //args::Flag stresstest(parser, "stresstest", "donig stresstest", {'s', "stresstest"});
 
     //args::Flag debugwindow(parser, "debugwindow", "Show debug window", {'w', "debugwindow"});
@@ -196,7 +197,8 @@ int main(int argc, char* argv[])
       int_bc_thres_start,
       int_bc_thres_stop,
       int_bc_thres_step,
-      float_meanfaktor
+      float_meanfaktor,
+      noocr==1
     );
     grabber->configCamera(
       int_exposure,

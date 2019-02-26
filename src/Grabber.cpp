@@ -125,6 +125,7 @@ void Grabber::ocrthread(cv::Mat img) {
   ir->barcode();
   ir->correctSize();
   ir->largestContour(false);
+
   ExtractAddress* ea = ir->texts();
 
 
@@ -306,7 +307,8 @@ void Grabber::configOCR(
   int bc_thres_start,
   int bc_thres_stop,
   int bc_thres_step,
-  float float_meanfaktor
+  float float_meanfaktor,
+  bool noocr
 ){
   b_debug=debug;
   b_debugtime=debugtime;
@@ -321,6 +323,7 @@ void Grabber::configOCR(
   i_bc_thres_stop=bc_thres_stop;
   i_bc_thres_step=bc_thres_step;
   f_meanfactor=float_meanfaktor;
+  b_noocr=noocr;
 }
 
 void Grabber::run_capture(){

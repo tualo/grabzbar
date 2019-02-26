@@ -80,7 +80,8 @@ public:
     int bc_thres_start,
     int bc_thres_stop,
     int bc_thres_step,
-    float float_meanfaktor
+    float float_meanfaktor,
+    bool noocr
   );
 private:
   int runningTasks;
@@ -142,6 +143,7 @@ private:
 
   boost::mutex mutex;
 
+  bool b_noocr;
 
   MYSQL *con;
 
