@@ -48,7 +48,7 @@ void Grabber::dbConnect(){
 }
 
 void Grabber::ocrthread(cv::Mat img) {
-  std::cout << "ocrthread debug " << b_debug << std::endl;
+  //std::cout << "ocrthread debug " << b_debug << std::endl;
   double _start_time = (double)cv::getTickCount();
 
 
@@ -117,11 +117,11 @@ void Grabber::ocrthread(cv::Mat img) {
   }
 
   ir->setPixelPerCM(i_pixel_cm_x,i_pixel_cm_y);
-  std::cout << "ocrthread i_pixel_cm_x " << i_pixel_cm_x << std::endl;
-  std::cout << "ocrthread i_pixel_cm_y " << i_pixel_cm_y << std::endl;
+  //std::cout << "ocrthread i_pixel_cm_x " << i_pixel_cm_x << std::endl;
+  //std::cout << "ocrthread i_pixel_cm_y " << i_pixel_cm_y << std::endl;
   ir->setImage(img);
   ir->rescale();
-  std::cout << "rescale " << std::endl;
+  //std::cout << "rescale " << std::endl;
   ir->barcode();
   ir->correctSize();
   ir->largestContour(false);
@@ -150,7 +150,7 @@ if (b_noocr==false){
   std::string code = ir->getBarcode();
 
   
-  std::cout << "ocrthread code " << code << std::endl;
+//  std::cout << "ocrthread code " << code << std::endl;
 
   /*
   if (code==""){
@@ -258,11 +258,11 @@ void Grabber::run(){
 }
 
 void Grabber::startocr(cv::Mat img){
-  std::cout << "startocr rows" << img.rows << " can start " <<  canStartTask() << std::endl;
+  //std::cout << "startocr rows" << img.rows << " can start " <<  canStartTask() << std::endl;
   if (canStartTask()){
     boost::thread* thr = new boost::thread(&Grabber::ocrthread, this , img);
   }else{
-    std::cout << "saving rows" << img.rows << std::endl;
+    //std::cout << "saving rows" << img.rows << std::endl;
     cv::imwrite((getFileName()).c_str(),img);
   }
 }
