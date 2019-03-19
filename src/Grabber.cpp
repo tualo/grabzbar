@@ -423,7 +423,7 @@ void Grabber::run_capture(){
     stopAVG=avg_stop;
     adjustAVG=0;
     currentAVG=stopAVG;
-    std::cout << "SET# " <<start <<  " --- "<< stop  << std::endl;
+    std::cout << "SET# " <<startAVG <<  " --- "<< stopAVG  << std::endl;
   }
     // Automagically call PylonInitialize and PylonTerminate to ensure the pylon runtime system
     // is initialized during the lifetime of this object.
