@@ -176,6 +176,10 @@ if (b_noocr==false){
 
     std::string customer;
     std::string line;
+    params.push_back(CV_IMWRITE_JPEG_QUALITY);
+    params.push_back(100);
+
+  mutex.lock();
     ifstream myfile ("/opt/grab/customer.txt");
     if (myfile.is_open())
     {
@@ -185,9 +189,10 @@ if (b_noocr==false){
       }
       myfile.close();
     }
+  mutex.unlock();
     
-    std::string code = prefix+std::string(customer+"N%012d.%06d.tiff");
-    sprintf(code, format.c_str() , ts.tv_sec, ts.tv_usec);
+    std::string code_format = prefix+std::string(customer+"N%012d.%06d");
+    sprintf(code, code_format.c_str() , ts.tv_sec, ts.tv_usec);
   } 
 
   boost::format fmt = boost::format("%s%s.%s.jpg") % getResultImagePath() % prefix % code;
