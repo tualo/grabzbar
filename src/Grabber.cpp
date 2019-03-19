@@ -178,6 +178,7 @@ if (b_noocr==false){
     std::string line;
     params.push_back(CV_IMWRITE_JPEG_QUALITY);
     params.push_back(100);
+im = ir->getOriginalImage();
 
   mutex.lock();
     std::ifstream myfile ("/opt/grab/customer.txt");
