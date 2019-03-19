@@ -51,6 +51,7 @@ public:
   void dbConnect();
 
 
+void configCameraAVG(int start,int stop);
 
   void configCamera(
     int grabExposure,

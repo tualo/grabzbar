@@ -216,12 +216,13 @@ int main(int argc, char* argv[])
 
     );
 
-if (istartAVG){ 
-  if (istopAVG){ 
-      grabber->configCameraAVG(args::get(istartAVG),args::get(istopAVG));
-  std::cout << "fixed AVG: " << args::get(istartAVG) << " x " << args::get(istopAVG) << std::endl;
-  }
-}
+    if (istartAVG){ 
+      if (istopAVG){ 
+          grabber->configCameraAVG(args::get(istartAVG),args::get(istopAVG));
+          std::cout << "fixed AVG: " << args::get(istartAVG) << " x " << args::get(istopAVG) << std::endl;
+      }
+    }
+    
     grabber->configConnection(
       std_str_machine,
       str_db_host,

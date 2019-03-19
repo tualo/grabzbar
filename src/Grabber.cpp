@@ -324,8 +324,8 @@ void Grabber::configCamera(
 
 }
 
-void configCameraAVG(int start,int stop){
-  avg_start =start;
+void Grabber::configCameraAVG(int start,int stop){
+  avg_start = start;
   avg_stop = stop;
 }
 
