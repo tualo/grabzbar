@@ -409,13 +409,6 @@ void Grabber::run_capture(){
 
 
 
-  if (avg_start>0){
-    startAVG=avg_start;
-    stopAVG=avg_stop;
-    adjustAVG=0;
-    currentAVG=stopAVG;
-  std::cout << "SET# " <<start <<  " --- "<< stop  << std::endl;
-  }
 
   mutex.unlock();
 
@@ -423,6 +416,15 @@ void Grabber::run_capture(){
 
   while(true){
     adjustAVG=10;
+
+
+  if (avg_start>0){
+    startAVG=avg_start;
+    stopAVG=avg_stop;
+    adjustAVG=0;
+    currentAVG=stopAVG;
+    std::cout << "SET# " <<start <<  " --- "<< stop  << std::endl;
+  }
     // Automagically call PylonInitialize and PylonTerminate to ensure the pylon runtime system
     // is initialized during the lifetime of this object.
     Pylon::PylonAutoInitTerm autoInitTerm;
