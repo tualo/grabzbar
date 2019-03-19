@@ -197,7 +197,7 @@ if (b_noocr==false){
     char result_code[128];
     sprintf(result_code, code_format.c_str() , ts.tv_sec, ts.tv_usec);
     //std::cout << ts.tv_sec <<  std::endl;
-    code = boost::format("%s") % result_code;
+    code = result_code;
   } 
 
   boost::format fmt = boost::format("%s%s.%s.jpg") % getResultImagePath() % prefix % code;
