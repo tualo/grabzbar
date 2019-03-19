@@ -199,12 +199,22 @@ if (b_noocr==false){
     //std::cout << ts.tv_sec <<  std::endl;
     code = result_code;
   } 
+std::string fname;
 
+if (b_noocr==false){
   boost::format fmt = boost::format("%s%s.%s.jpg") % getResultImagePath() % prefix % code;
-  std::string fname = fmt.str();
+  fname = fmt.str();
   mutex.lock();
   std::cout << fname << std::endl;
   mutex.unlock();
+}else{
+  boost::format fmt = boost::format("%s%s.jpg") % getResultImagePath() % code;
+  fname = fmt.str();
+  mutex.lock();
+  std::cout << fname << std::endl;
+  mutex.unlock();
+}
+
 
 
 
