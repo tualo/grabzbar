@@ -327,6 +327,8 @@ void Grabber::configCamera(
 void Grabber::configCameraAVG(int start,int stop){
   avg_start = start;
   avg_stop = stop;
+  std::cout << "configCameraAVG" <<start <<  " --- "<< stop  << std::endl;
+  
 }
 
 void Grabber::configConnection(
@@ -406,11 +408,13 @@ void Grabber::run_capture(){
   int _grabGain = glb_grabGain;
 
 
-  if (avg_start!=-1){
+
+  if (avg_start>0){
     startAVG=avg_start;
     stopAVG=avg_stop;
     adjustAVG=0;
     currentAVG=stopAVG;
+  std::cout << "SET# " <<start <<  " --- "<< stop  << std::endl;
   }
 
   mutex.unlock();
