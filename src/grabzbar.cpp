@@ -81,6 +81,12 @@ int main(int argc, char* argv[])
     args::Flag debugtime(parser, "debugtime", "Show times", {'t', "debugtime"});
 
     args::ValueFlag<int> exposure(parser, "exposure", "exposure (1300)", {"exposure"});
+
+
+    args::ValueFlag<int> istartAVG(parser, "startAVG", "startAVG", {"startAVG"});
+    args::ValueFlag<int> istopAVG(parser, "stopAVG", "stopAVG", {"stopAVG"});
+
+    
     args::ValueFlag<int> lineheight(parser, "lineheight", "height of one captured image (32)", { "lineheight"});
     args::ValueFlag<int> maxheight(parser, "maxheight", "max image height (4000)", { "maxheight"});
 
@@ -181,6 +187,7 @@ int main(int argc, char* argv[])
     if (arg_resultpath){ std_str_resultpath=args::get(arg_resultpath); }
     if (arg_storepath){ std_str_storepath=args::get(arg_storepath); }
 
+    
     // --- Ocrs
     Grabber *grabber=new Grabber();
     grabber->setResultImagePath(std_str_resultpath);
@@ -206,8 +213,15 @@ int main(int argc, char* argv[])
       int_maxheight,
       int_binning,
       int_gain
+
     );
 
+if (istartAVG){ 
+  if (istopAVG){ 
+      grabber->configCameraAVG(args::get(istartAVG),args::get(istopAVG));
+  std::cout << "fixed AVG: " << args::get(istartAVG) << " x " << args::get(istopAVG) << std::endl;
+  }
+}
     grabber->configConnection(
       std_str_machine,
       str_db_host,

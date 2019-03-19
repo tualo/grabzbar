@@ -136,6 +136,9 @@ private:
   int glb_grabGain;
 
 
+  int avg_start;
+  int avg_stop;
+
   float f_meanfactor;
 
   cv::Mat currentImage;

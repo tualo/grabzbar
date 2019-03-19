@@ -17,6 +17,9 @@ Grabber::Grabber():
   f_meanfactor=1.0;
   b_bc_clahe=false;
   b_forceFPCode=false;
+
+  avg_start=-1;
+  avg_stop = -1;
 }
 
 Grabber::~Grabber() {
@@ -321,6 +324,11 @@ void Grabber::configCamera(
 
 }
 
+void configCameraAVG(int start,int stop){
+  avg_start =start;
+  avg_stop = stop;
+}
+
 void Grabber::configConnection(
   std::string machine,
   std::string db_host,
@@ -368,6 +376,8 @@ void Grabber::configOCR(
   b_noocr=noocr;
 }
 
+
+
 void Grabber::run_capture(){
   mutex.lock();
 
@@ -394,6 +404,14 @@ void Grabber::run_capture(){
   int _maxImageHeight = glb_maxImageHeight;
   int _grabBinning = glb_grabBinning;
   int _grabGain = glb_grabGain;
+
+
+  if (avg_start!=-1){
+    startAVG=avg_start;
+    stopAVG=avg_stop;
+    adjustAVG=0;
+    currentAVG=stopAVG;
+  }
 
   mutex.unlock();
 
