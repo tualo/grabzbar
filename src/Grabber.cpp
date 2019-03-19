@@ -192,10 +192,12 @@ if (b_noocr==false){
   mutex.unlock();
     struct timeval ts;
     gettimeofday(&ts,NULL);
-    //std::string code_format = prefix+std::string(customer+"N%012d.%06d");
-    //sprintf(code, code_format.c_str() , ts.tv_sec, ts.tv_usec);
+    std::string code_format = prefix+std::string(customer+"N%012d.%06d");
+
+    char result_code[128];
+    sprintf(result_code, code_format.c_str() , ts.tv_sec, ts.tv_usec);
     //std::cout << ts.tv_sec <<  std::endl;
-    code = boost::format("%sN%012d.%06d") % customer %  ts.tv_sec, ts.tv_usec;
+    code = boost::format("%s") % std::string(result_code);
   } 
 
   boost::format fmt = boost::format("%s%s.%s.jpg") % getResultImagePath() % prefix % code;
