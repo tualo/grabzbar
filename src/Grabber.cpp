@@ -180,7 +180,7 @@ if (b_noocr==false){
     params.push_back(100);
 
   mutex.lock();
-    ifstream myfile ("/opt/grab/customer.txt");
+    std::ifstream myfile ("/opt/grab/customer.txt");
     if (myfile.is_open())
     {
       while ( getline (myfile,line) )
@@ -190,7 +190,8 @@ if (b_noocr==false){
       myfile.close();
     }
   mutex.unlock();
-    
+    struct timeval ts;
+    gettimeofday(&ts,NULL);
     std::string code_format = prefix+std::string(customer+"N%012d.%06d");
     sprintf(code, code_format.c_str() , ts.tv_sec, ts.tv_usec);
   } 
