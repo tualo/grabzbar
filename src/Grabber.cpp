@@ -152,26 +152,44 @@ if (b_noocr==false){
   
 //  std::cout << "ocrthread code " << code << std::endl;
 
-  /*
-  if (code==""){
-    // no code
-    prefix = "nocode";
-    struct timeval ts;
-    gettimeofday(&ts,NULL);
-    boost::format cfmt = boost::format("%012d.%06d") % ts.tv_sec % ts.tv_usec;
-    code = cfmt.str();
-    im = ir->getOriginalImage();
-  }else if(ea->foundAddress()){
-    prefix = "good";
-    params.push_back(CV_IMWRITE_JPEG_QUALITY);
-    params.push_back(80);
+  if (b_noocr==false){
+
+    if (code==""){
+      // no code
+      prefix = "nocode";
+      struct timeval ts;
+      gettimeofday(&ts,NULL);
+      boost::format cfmt = boost::format("%012d.%06d") % ts.tv_sec % ts.tv_usec;
+      code = cfmt.str();
+      im = ir->getOriginalImage();
+    }else if(ea->foundAddress()){
+      prefix = "good";
+      params.push_back(CV_IMWRITE_JPEG_QUALITY);
+      params.push_back(80);
+    }else{
+      prefix = "noaddress";
+      im = ir->getOriginalImage();
+      params.push_back(CV_IMWRITE_JPEG_QUALITY);
+      params.push_back(80);
+    }
   }else{
-    prefix = "noaddress";
-    im = ir->getOriginalImage();
-    params.push_back(CV_IMWRITE_JPEG_QUALITY);
-    params.push_back(80);
-  }
-  */
+
+    std::string customer;
+    std::string line;
+    ifstream myfile ("/opt/grab/customer.txt");
+    if (myfile.is_open())
+    {
+      while ( getline (myfile,line) )
+      {
+        customer = line;
+      }
+      myfile.close();
+    }
+    
+    std::string code = prefix+std::string(customer+"N%012d.%06d.tiff");
+    sprintf(code, format.c_str() , ts.tv_sec, ts.tv_usec);
+  } 
+
   boost::format fmt = boost::format("%s%s.%s.jpg") % getResultImagePath() % prefix % code;
   std::string fname = fmt.str();
   mutex.lock();
