@@ -197,6 +197,7 @@ if (b_noocr==false){
       myfile.close();
     }
 
+    std::cout << std::endl << "=====================::" << b_rls << std::endl << "=====================" <<  std::endl;
     if (b_rls){
       std::string state = getResultState();
 
