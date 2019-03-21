@@ -197,14 +197,16 @@ if (b_noocr==false){
       myfile.close();
     }
 
-    std::string state = getResultState();
+    if (b_rls){
+      std::string state = getResultState();
 
-    if (state!=""){
-      std::string sql = boost::str(set_sv_stati_fmt % ir->getBarcode() );
-      std::cout << std::endl << "=====================" << sql << std::endl << "=====================" <<  std::endl;
-   
-      if (mysql_query(con, sql.c_str())){
-        fprintf(stderr, "%s\n", mysql_error(con));
+      if (state!=""){
+        std::string sql = boost::str(set_sv_stati_fmt % ir->getBarcode() );
+        std::cout << std::endl << "=====================" << sql << std::endl << "=====================" <<  std::endl;
+    
+        if (mysql_query(con, sql.c_str())){
+          fprintf(stderr, "%s\n", mysql_error(con));
+        }
       }
     }
    

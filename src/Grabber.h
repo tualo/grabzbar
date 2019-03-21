@@ -151,7 +151,7 @@ private:
   boost::mutex mutex;
 
   bool b_noocr;
-  bool b_setrls;
+  bool b_rls;
 
   MYSQL *con;
 
