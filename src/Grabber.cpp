@@ -202,8 +202,9 @@ if (b_noocr==false){
       if (state!=""){
         std::list<std::string> liste = ir->barcodelist();
 
-        for (std::list<std::string>::iterator it = liste.begin(); it != liste.end(); ++it){
-          std::string sql = boost::str(set_sv_stati_fmt % it % state );
+        for (int i = 0; i<liste.size(); i++){
+          std::string c = liste.at(i);
+          std::string sql = boost::str(set_sv_stati_fmt % cs % state );
           std::cout << std::endl << "=====================" << sql << std::endl << "=====================" <<  std::endl;
           if (mysql_query(con, sql.c_str())){
             fprintf(stderr, "%s\n", mysql_error(con));
