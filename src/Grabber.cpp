@@ -186,6 +186,15 @@ if (b_noocr==false){
     params.push_back(100);
     im = ir->getOriginalImage();
 
+
+
+    struct timeval ts;
+    gettimeofday(&ts,NULL);
+    std::string code_format = prefix+std::string(customer+"N%012d.%06d");
+    char result_code[128];
+    sprintf(result_code, code_format.c_str() , ts.tv_sec, ts.tv_usec);
+    code = result_code;
+
     mutex.lock();
     std::ifstream myfile ("/opt/grab/customer.txt");
     if (myfile.is_open())
@@ -198,18 +207,23 @@ if (b_noocr==false){
     }
 
     if (b_rls){
+
       std::string state = getResultState();
       if (state!=""){
         std::list<std::string> liste = ir->barcodelist();
 
-        for (int i = 0; i<liste.size(); i++){
-          std::string c = liste.at(i);
-          std::string sql = boost::str(set_sv_stati_fmt % cs % state );
+
+std::list<std::string>::const_iterator i;
+for(i = liste.begin(); i != liste.end(); ++i){
+  
+  std::string sql = boost::str(set_sv_stati_fmt % *i % state );
           std::cout << std::endl << "====================="  << std::endl  << sql << std::endl << "=====================" <<  std::endl;
           if (mysql_query(con, sql.c_str())){
             fprintf(stderr, "%s\n", mysql_error(con));
           }
-        }
+
+}
+
 
         
 
@@ -221,14 +235,8 @@ if (b_noocr==false){
 
     mutex.unlock();
 
-    struct timeval ts;
-    gettimeofday(&ts,NULL);
-    std::string code_format = prefix+std::string(customer+"N%012d.%06d");
 
-    char result_code[128];
-    sprintf(result_code, code_format.c_str() , ts.tv_sec, ts.tv_usec);
-    //std::cout << ts.tv_sec <<  std::endl;
-    code = result_code;
+
   } 
 
 
