@@ -2,7 +2,8 @@
 
 boost::format quicksvfmt("call quicksv('%s','%s','%s','%s','%s', '%s','%s','%s','%s','%s') ");
 
-boost::format set_sv_stati_fmt("call SET_SV_STATI('%s',current_date,current_time,'%s') ");
+boost::format set_camera_images_fmt("insert into camera_images (id,inserttime,kunde,state) values (%s,now(),%s,%s);  ");
+boost::format set_camera_imagescodes_fmt("insert into camera_imagescodes (id,code) values (%s,%s) on duplicate key update id=values(id)");
 
 
 Grabber::Grabber():
@@ -180,7 +181,7 @@ if (b_noocr==false){
     }
   }else{
 
-    std::string customer;
+    std::string customer="";
     std::string line;
     params.push_back(CV_IMWRITE_JPEG_QUALITY);
     params.push_back(100);
@@ -193,7 +194,7 @@ if (b_noocr==false){
     std::string code_format = prefix+std::string(customer+"N%012d.%06d");
     char result_code[128];
     sprintf(result_code, code_format.c_str() , ts.tv_sec, ts.tv_usec);
-    code = result_code;
+    std::string fnamecode = result_code;
 
     mutex.lock();
     std::ifstream myfile ("/opt/grab/customer.txt");
@@ -208,28 +209,31 @@ if (b_noocr==false){
 
     if (b_rls){
 
+
+
       std::string state = getResultState();
       if (state!=""){
+
+
+        std::string sql = boost::str(set_camera_images_fmt % fnamecode % customer % state );
+        std::cout << std::endl << "====================="  << std::endl  << sql << std::endl << "=====================" <<  std::endl;
+        if (mysql_query(con, sql.c_str())){
+          fprintf(stderr, "%s\n", mysql_error(con));
+        }
+
+
         std::list<std::string> liste = ir->barcodelist();
-
-
-std::list<std::string>::const_iterator i;
-for(i = liste.begin(); i != liste.end(); ++i){
-  
-  std::string sql = boost::str(set_sv_stati_fmt % *i % state );
+        std::list<std::string>::const_iterator i;
+        for(i = liste.begin(); i != liste.end(); ++i){
+          
+          std::string sql = boost::str(set_camera_imagescodes_fmt % fnamecode % *i );
           std::cout << std::endl << "====================="  << std::endl  << sql << std::endl << "=====================" <<  std::endl;
           if (mysql_query(con, sql.c_str())){
             fprintf(stderr, "%s\n", mysql_error(con));
           }
 
-}
-
-
-        
-
-
-    
-      }
+        }
+      } // state
     }
    
 
