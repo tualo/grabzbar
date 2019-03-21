@@ -2,7 +2,7 @@
 
 boost::format quicksvfmt("call quicksv('%s','%s','%s','%s','%s', '%s','%s','%s','%s','%s') ");
 
-boost::format set_sv_stati_fmt("call SET_SV_STATI('%s',cuttent_date,current_time,'%s') ");
+boost::format set_sv_stati_fmt("call SET_SV_STATI('%s',current_date,current_time,'%s') ");
 
 
 Grabber::Grabber():
