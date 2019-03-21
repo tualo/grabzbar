@@ -2,7 +2,7 @@
 .PHONY			: all clean install
 
 # The program to build
-NAME			:= checkcode
+NAME			:= main
 OUTPUT   	:= $(NAME)
 
 
@@ -42,7 +42,6 @@ LDLIBS     += -lboost_thread-mt
 LDLIBS     += -lboost_atomic-mt
 CPPFLAGS += -I/Library/Frameworks/pylon.framework/Headers/
 CPPFLAGS += -I/Library/Frameworks/pylon.framework/Headers/GenICam/
-CPPFLAGS += -std=c++11
 LDFLAGS  +=-Wl,-rpath,/Library/Frameworks
 LDLIBS   += -F"/Library/Frameworks/" -framework pylon
 endif
@@ -51,7 +50,7 @@ endif
 all				: $(NAME)
 
 $(NAME)			: $(NAME).o
-	$(LD) $(LDFLAGS) -v -o $@ checkcode.o $(LDLIBS)
+	$(LD) $(LDFLAGS) -v -o $@ main.o $(LDLIBS)
 
 SOURCES := $(shell find . -name '*.cpp')
 HEADERS := $(shell find . -name '*.h')
@@ -60,7 +59,7 @@ HEADERS := $(shell find . -name '*.h')
 
 $(NAME).o: $(SOURCES) $(HEADERS)
 
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./checkcode.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./main.cpp
 
 
 	#	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<

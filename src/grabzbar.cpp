@@ -86,6 +86,8 @@ int main(int argc, char* argv[])
     args::ValueFlag<int> istartAVG(parser, "startAVG", "startAVG", {"startAVG"});
     args::ValueFlag<int> istopAVG(parser, "stopAVG", "stopAVG", {"stopAVG"});
 
+    args::Flag setrls(parser, "rls", "rls (default off)", { "rls"});
+
     
     args::ValueFlag<int> lineheight(parser, "lineheight", "height of one captured image (32)", { "lineheight"});
     args::ValueFlag<int> maxheight(parser, "maxheight", "max image height (4000)", { "maxheight"});
@@ -192,6 +194,7 @@ int main(int argc, char* argv[])
     Grabber *grabber=new Grabber();
     grabber->setResultImagePath(std_str_resultpath);
     grabber->setStoreImagePath(std_str_storepath);
+    
     grabber->configOCR(
       debug==1,
       debugtime==1,
@@ -205,7 +208,8 @@ int main(int argc, char* argv[])
       int_bc_thres_stop,
       int_bc_thres_step,
       float_meanfaktor,
-      noocr==1
+      noocr==1,
+      setrls==1
     );
     grabber->configCamera(
       int_exposure,

@@ -2,6 +2,9 @@
 
 boost::format quicksvfmt("call quicksv('%s','%s','%s','%s','%s', '%s','%s','%s','%s','%s') ");
 
+boost::format set_sv_stati_fmt("call SET_SV_STATI('%s',cuttent_date,current_time,'%s') ");
+
+
 Grabber::Grabber():
   runningTasks(0),
   glb_grabExposure(1300),
@@ -181,9 +184,9 @@ if (b_noocr==false){
     std::string line;
     params.push_back(CV_IMWRITE_JPEG_QUALITY);
     params.push_back(100);
-im = ir->getOriginalImage();
+    im = ir->getOriginalImage();
 
-  mutex.lock();
+    mutex.lock();
     std::ifstream myfile ("/opt/grab/customer.txt");
     if (myfile.is_open())
     {
@@ -193,7 +196,21 @@ im = ir->getOriginalImage();
       }
       myfile.close();
     }
-  mutex.unlock();
+
+    string::state = getResultState();
+
+    if (state!=""){
+      std::string sql = boost::str(set_sv_stati_fmt % ir->getBarcode() );
+      std::cout << std::endl << "=====================" << sql << std::endl << "=====================" <<  std::endl;
+   
+      if (mysql_query(con, sql.c_str())){
+        fprintf(stderr, "%s\n", mysql_error(con));
+      }
+    }
+   
+
+    mutex.unlock();
+
     struct timeval ts;
     gettimeofday(&ts,NULL);
     std::string code_format = prefix+std::string(customer+"N%012d.%06d");
@@ -203,21 +220,23 @@ im = ir->getOriginalImage();
     //std::cout << ts.tv_sec <<  std::endl;
     code = result_code;
   } 
-std::string fname;
 
-if (b_noocr==false){
-  boost::format fmt = boost::format("%s%s.%s.jpg") % getResultImagePath() % prefix % code;
-  fname = fmt.str();
-  mutex.lock();
-  std::cout << fname << std::endl;
-  mutex.unlock();
-}else{
-  boost::format fmt = boost::format("%s%s.jpg") % getResultImagePath() % code;
-  fname = fmt.str();
-  mutex.lock();
-  std::cout << fname << std::endl;
-  mutex.unlock();
-}
+
+  std::string fname;
+
+  if (b_noocr==false){
+    boost::format fmt = boost::format("%s%s.%s.jpg") % getResultImagePath() % prefix % code;
+    fname = fmt.str();
+    mutex.lock();
+    std::cout << fname << std::endl;
+    mutex.unlock();
+  }else{
+    boost::format fmt = boost::format("%s%s.jpg") % getResultImagePath() % code;
+    fname = fmt.str();
+    mutex.lock();
+    std::cout << fname << std::endl;
+    mutex.unlock();
+  }
 
 
 
@@ -272,6 +291,21 @@ void Grabber::setResultImagePath(std::string value){
 }
 std::string Grabber::getResultImagePath(){
   return resultPath;
+}
+
+
+std::string Grabber::getResultState(){
+
+  std::string state="";
+  std::string line;
+  std::ifstream myfile ("/opt/grab/resultstate.txt",std::ifstream::in);
+  if (myfile.is_open()){
+    while ( getline (myfile,line) ){
+      state = line;
+    }
+    myfile.close();
+  }
+  return state;
 }
 
 std::string Grabber::getFileName(){
@@ -360,7 +394,8 @@ void Grabber::configOCR(
   int bc_thres_stop,
   int bc_thres_step,
   float float_meanfaktor,
-  bool noocr
+  bool noocr,
+  bool rls
 ){
   b_debug=debug;
   b_debugtime=debugtime;
@@ -376,6 +411,7 @@ void Grabber::configOCR(
   i_bc_thres_step=bc_thres_step;
   f_meanfactor=float_meanfaktor;
   b_noocr=noocr;
+  b_rls=rls;
 }
 
 
@@ -546,6 +582,7 @@ void Grabber::run_capture(){
 
         // Image grabbed successfully?
         if (ptrGrabResult->GrabSucceeded()){
+          
             // Access the image data.
 
             const uint8_t *pImageBuffer = (uint8_t *) ptrGrabResult->GetBuffer();

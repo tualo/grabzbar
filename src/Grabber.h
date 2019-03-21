@@ -48,6 +48,8 @@ public:
   void setResultImagePath(std::string value);
   std::string getResultImagePath();
   std::string getFileName();
+  std::string getResultState();
+
   void dbConnect();
 
 
@@ -82,6 +84,7 @@ void configCameraAVG(int start,int stop);
     int bc_thres_stop,
     int bc_thres_step,
     float float_meanfaktor,
+    bool noocr,
     bool noocr
   );
 private:
@@ -148,6 +151,7 @@ private:
   boost::mutex mutex;
 
   bool b_noocr;
+  bool b_setrls;
 
   MYSQL *con;
 
