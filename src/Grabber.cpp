@@ -197,7 +197,7 @@ if (b_noocr==false){
       myfile.close();
     }
 
-    string::state = getResultState();
+    std::string state = getResultState();
 
     if (state!=""){
       std::string sql = boost::str(set_sv_stati_fmt % ir->getBarcode() );

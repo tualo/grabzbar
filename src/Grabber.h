@@ -85,7 +85,7 @@ void configCameraAVG(int start,int stop);
     int bc_thres_step,
     float float_meanfaktor,
     bool noocr,
-    bool noocr
+    bool rls
   );
 private:
   int runningTasks;
