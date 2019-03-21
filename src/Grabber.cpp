@@ -241,6 +241,7 @@ if (b_noocr==false){
       } // state
     }
    
+    code = fnamecode;
 
     mutex.unlock();
 
