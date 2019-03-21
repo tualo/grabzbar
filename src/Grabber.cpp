@@ -189,14 +189,11 @@ if (b_noocr==false){
 
 
 
-    struct timeval ts;
-    gettimeofday(&ts,NULL);
-    std::string code_format = prefix+std::string(customer+"N%012d.%06d");
-    char result_code[128];
-    sprintf(result_code, code_format.c_str() , ts.tv_sec, ts.tv_usec);
-    std::string fnamecode = result_code;
 
     mutex.lock();
+
+    std::string state = getResultState();
+
     std::ifstream myfile ("/opt/grab/customer.txt");
     if (myfile.is_open())
     {
@@ -207,11 +204,19 @@ if (b_noocr==false){
       myfile.close();
     }
 
+    struct timeval ts;
+    gettimeofday(&ts,NULL);
+    std::string code_format = prefix+std::string(customer+"N%012d.%06d"+"S"+state);
+    char result_code[128];
+    sprintf(result_code, code_format.c_str() , ts.tv_sec, ts.tv_usec);
+    std::string fnamecode = result_code;
+
+
     if (b_rls){
 
 
 
-      std::string state = getResultState();
+      
       if (state!=""){
 
 

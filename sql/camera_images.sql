@@ -1,5 +1,8 @@
+drop table camera_imagescodes;
+drop table camera_images;
+
 create table camera_images (
-  id varchar(25) not null primary key,
+  id varchar(45) not null primary key,
   inserttime datetime not null,
   kunde varchar(20) not null,
   state varchar(5) not null
@@ -7,7 +10,7 @@ create table camera_images (
 
 
 create table camera_imagescodes(
-  id varchar(25) not null,
+  id varchar(45) not null,
   code varchar(50) not null,
   primary key (id,code),
 
