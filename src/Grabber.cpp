@@ -2,8 +2,8 @@
 
 boost::format quicksvfmt("call quicksv('%s','%s','%s','%s','%s', '%s','%s','%s','%s','%s') ");
 
-boost::format set_camera_images_fmt("insert into camera_images (id,inserttime,kunde,state) values (%s,now(),%s,%s);  ");
-boost::format set_camera_imagescodes_fmt("insert into camera_imagescodes (id,code) values (%s,%s) on duplicate key update id=values(id)");
+boost::format set_camera_images_fmt("insert into camera_images (id,inserttime,kunde,state) values ('%s',now(),'%s','%s');  ");
+boost::format set_camera_imagescodes_fmt("insert into camera_imagescodes (id,code) values ('%s','%s') on duplicate key update id=values(id)");
 
 
 Grabber::Grabber():
