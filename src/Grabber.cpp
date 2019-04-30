@@ -60,19 +60,12 @@ void Grabber::barcodethread(cv::Mat img) {
   std::string customer = "";
   std::string state="";
   mutex.lock();
-  std::cout << std::endl << "====================="  << std::endl  << "barcodethread ###########" << std::endl << "=====================" <<  std::endl;
 
-  std::cout << "barcodethread a" << std::endl;
   customer = getCustomer();
-  std::cout << "barcodethread b" << std::endl;
   state = getResultState();
-  std::cout << "barcodethread b" << std::endl;
   runningTasks++;
-  std::cout << "barcodethread c" << std::endl;
-  std::cout << "barcodethread c" << customer << std::endl;
   
   std::string fn = getFileName(customer);
-  std::cout << "barcodethread d" << std::endl;
   mutex.unlock();
 
   std::string line;
@@ -81,39 +74,30 @@ void Grabber::barcodethread(cv::Mat img) {
   
   
   FindCodes *fc = new FindCodes();
-  mutex.lock();
-  std::cout << std::endl << "====================="  << std::endl  << "barcodethread~~ ###########" << std::endl << "=====================" <<  std::endl;
-  mutex.unlock();
+
   
   fc->detectCodes(img);
-
-
   mutex.lock();
-
-
   cv::imwrite((fn).c_str(),img);
   
 
   std::string sql = boost::str(set_camera_images_fmt_grapper % basename % customer % state );
-  std::cout << std::endl << "====================="  << std::endl  << sql << std::endl << "=====================" <<  std::endl;
   if (mysql_query(con, sql.c_str())){
       fprintf(stderr, "%s\n", mysql_error(con));
-      exit(1);
+//      exit(1);
   }
 
   std::list<Barcode*> barcodes = fc->codes();
   std::list<Barcode*>::const_iterator it;
   for (it = barcodes.begin(); it != barcodes.end(); ++it){
       std::string sql = boost::str(set_camera_imagescodes_fmt_grapper % basename % ((Barcode*)*it)->code() );
-      std::cout << std::endl << "====================="  << std::endl  << sql << std::endl << "=====================" <<  std::endl;
       if (mysql_query(con, sql.c_str())){
           fprintf(stderr, "%s\n", mysql_error(con));
-          exit(1);
+//          exit(1);
       }
   } 
 
   runningTasks--;
-  std::cout << std::endl << "====================="  << std::endl  << "barcodethread --------" << std::endl << "=====================" <<  std::endl;
   mutex.unlock();
 
 
@@ -422,17 +406,13 @@ std::string Grabber::getCustomer(){
 
 std::string Grabber::getFileName(std::string customer){
 
-  std::cout << "getFileName a" << std::endl;
   struct timeval ts;
-  std::cout << "getFileName b" << std::endl;
   gettimeofday(&ts,NULL);
-  std::cout << "getFileName c" << std::endl;
+ 
   std::string ext = ".jpg";//str_extension;
-  std::cout << "getFileName d" << std::endl;
+ 
   std::string machine = "M00";
-  std::cout << "getFileName e" << std::endl;
   boost::format fmt = boost::format("%s%sN%012d.%06d.%s.%s") % getStoreImagePath() % customer % ts.tv_sec % ts.tv_usec % machine % ext;
-  std::cout << "getFileName f" << std::endl;
   return fmt.str();
 }
 
