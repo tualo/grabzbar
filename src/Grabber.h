@@ -17,6 +17,7 @@
 #include <boost/chrono.hpp>
 #include <boost/asio.hpp>
 #include <boost/format.hpp>
+#include <boost/filesystem.hpp>
 
 #include <boost/thread/scoped_thread.hpp>
 #include <iostream>
@@ -112,7 +113,7 @@ private:
   void run_streamer();
   void run_capture();
   std::string getFileName(std::string customer);
-  std::string Grabber::getCustomer();
+  std::string getCustomer();
   void ocrthread(cv::Mat img);
   void barcodethread(cv::Mat img);
   void startocr(cv::Mat img);

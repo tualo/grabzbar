@@ -2,8 +2,8 @@
 
 boost::format quicksvfmt("call quicksv('%s','%s','%s','%s','%s', '%s','%s','%s','%s','%s') ");
 
-boost::format set_camera_images_fmt("insert into camera_images (id,inserttime,kunde,state) values ('%s',now(),'%s','%s');  ");
-boost::format set_camera_imagescodes_fmt("insert into camera_imagescodes (id,code) values ('%s','%s') on duplicate key update id=values(id)");
+boost::format set_camera_images_fmt_grapper("insert into camera_images (id,inserttime,kunde,state) values ('%s',now(),'%s','%s');  ");
+boost::format set_camera_imagescodes_fmt_grapper("insert into camera_imagescodes (id,code) values ('%s','%s') on duplicate key update id=values(id)");
 
 
 Grabber::Grabber():
@@ -78,7 +78,7 @@ void Grabber::barcodethread(cv::Mat img) {
   mutex.lock();
   cv::imwrite((fn).c_str(),img);
   
-  std::string sql = boost::str(set_camera_images_fmt % basename % customer % state );
+  std::string sql = boost::str(set_camera_images_fmt_grapper % basename % customer % state );
   std::cout << std::endl << "====================="  << std::endl  << sql << std::endl << "=====================" <<  std::endl;
   if (mysql_query(con, sql.c_str())){
       fprintf(stderr, "%s\n", mysql_error(con));
@@ -88,7 +88,7 @@ void Grabber::barcodethread(cv::Mat img) {
   std::list<Barcode*> barcodes = fc->codes();
   std::list<Barcode*>::const_iterator it;
   for (it = barcodes.begin(); it != barcodes.end(); ++it){
-      std::string sql = boost::str(set_camera_imagescodes_fmt % basename % ((Barcode*)*it)->code() );
+      std::string sql = boost::str(set_camera_imagescodes_fmt_grapper % basename % ((Barcode*)*it)->code() );
       std::cout << std::endl << "====================="  << std::endl  << sql << std::endl << "=====================" <<  std::endl;
       if (mysql_query(con, sql.c_str())){
           fprintf(stderr, "%s\n", mysql_error(con));
@@ -268,7 +268,7 @@ if (b_noocr==false){
       if (state!=""){
 
 
-        std::string sql = boost::str(set_camera_images_fmt % fnamecode % customer % state );
+        std::string sql = boost::str(set_camera_images_fmt_grapper % fnamecode % customer % state );
         std::cout << std::endl << "====================="  << std::endl  << sql << std::endl << "=====================" <<  std::endl;
         if (mysql_query(con, sql.c_str())){
           fprintf(stderr, "%s\n", mysql_error(con));
@@ -279,7 +279,7 @@ if (b_noocr==false){
         std::list<std::string>::const_iterator i;
         for(i = liste.begin(); i != liste.end(); ++i){
           
-          std::string sql = boost::str(set_camera_imagescodes_fmt % fnamecode % *i );
+          std::string sql = boost::str(set_camera_imagescodes_fmt_grapper % fnamecode % *i );
           std::cout << std::endl << "====================="  << std::endl  << sql << std::endl << "=====================" <<  std::endl;
           if (mysql_query(con, sql.c_str())){
             fprintf(stderr, "%s\n", mysql_error(con));
