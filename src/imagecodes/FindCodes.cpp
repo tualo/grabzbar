@@ -84,8 +84,6 @@ void FindCodes::detectCodes(cv::Mat image){
         ((boost::thread*)*it)->join();
     }
 
-    delete meanLoopThread;
-    
     debugTime("stop detectCodes");
     //debugCodes();
 }
