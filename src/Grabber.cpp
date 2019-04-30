@@ -427,7 +427,7 @@ void Grabber::startocr(cv::Mat img){
 //    }else{
 //      boost::thread* thr = new boost::thread(&Grabber::ocrthread, this , img);
 //
-    }
+//    }
   }else{
     cv::imwrite((getFileName(getCustomer())).c_str(),img);
   }
