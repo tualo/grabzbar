@@ -405,8 +405,8 @@ std::string Grabber::getFileName(std::string customer){
 
   struct timeval ts;
   gettimeofday(&ts,NULL);
-  std:string ext = str_extension;
-  std:string machine = "M00";
+  std::string ext = str_extension;
+  std::string machine = "M00";
   boost::format fmt = boost::format("%s%sN%012d.%06d.%s.%s") % getStoreImagePath() % customer % ts.tv_sec % ts.tv_usec % machine % ext;
   return fmt.str();
 }
