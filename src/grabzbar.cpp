@@ -25,6 +25,7 @@
 // #### Ocrs
 
 
+
 std::string std_str_machine="0";
 std::string std_str_storepath="/tmp/";
 std::string std_str_resultpath="/tmp/";
