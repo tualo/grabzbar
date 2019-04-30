@@ -65,7 +65,7 @@ void Grabber::barcodethread(cv::Mat img) {
   std::cout << "barcodethread a" << std::endl;
   customer = ""; // getCustomer();
   std::cout << "barcodethread b" << std::endl;
-  state = "99";//getResultState();
+  state = getResultState();
   std::cout << "barcodethread b" << std::endl;
   runningTasks++;
   std::cout << "barcodethread c" << std::endl;
