@@ -112,7 +112,7 @@ private:
   void run_streamer();
   void run_capture();
   std::string getFileName(std::string customer);
-  std::dtring Grabber::getCustomer();
+  std::string Grabber::getCustomer();
   void ocrthread(cv::Mat img);
   void barcodethread(cv::Mat img);
   void startocr(cv::Mat img);
