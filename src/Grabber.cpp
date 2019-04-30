@@ -396,7 +396,7 @@ std::string Grabber::getCustomer(){
   std::ifstream myfile ("/opt/grab/customer.txt",std::ifstream::in);
   if (myfile.is_open()){
     while ( getline (myfile,line) ){
-      std::replace( line.begin(), line.end(), '|', 'Z');
+      //std::replace( line.begin(), line.end(), '|', 'Z');
       customer = line;
     }
     myfile.close();
