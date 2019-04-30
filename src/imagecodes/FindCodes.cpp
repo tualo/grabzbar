@@ -129,6 +129,9 @@ void FindCodes::detectByThreshold(cv::Mat image,int thres) {
     mutex.unlock();
     cv::threshold(useimage,gray,thres,255, CV_THRESH_BINARY );
     findCodeInImage(gray);
+    
+    gray.release();
+    useimage.release();
 }
 
 void FindCodes::detectByAdaptiveThreshold(cv::Mat image,int blocksize, int subtractmean) {
@@ -152,6 +155,10 @@ void FindCodes::detectByAdaptiveThreshold(cv::Mat image,int blocksize, int subtr
             subtractmean
         );
         findCodeInImage(gray);
+
+        gray.release();
+        useimage.release();
+
 }
 
 void FindCodes::findBlured(cv::Mat image){
@@ -161,6 +168,10 @@ void FindCodes::findBlured(cv::Mat image){
     mutex.unlock();
     cv::GaussianBlur(useimage,gray,cv::Size(3,3),2,2);
     findCodeInImage(gray);
+
+    gray.release();
+    useimage.release();
+
 }
 
 void FindCodes::findCodeInImage(cv::Mat gray) {
