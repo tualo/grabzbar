@@ -60,6 +60,7 @@ void Grabber::barcodethread(cv::Mat img) {
   std::string customer = "";
   std::string state="";
   mutex.lock();
+  std::cout << std::endl << "====================="  << std::endl  << "barcodethread ###########" << std::endl << "=====================" <<  std::endl;
   customer = getCustomer();
   state = getResultState();
   runningTasks++;
@@ -72,6 +73,10 @@ void Grabber::barcodethread(cv::Mat img) {
   
   
   FindCodes *fc = new FindCodes();
+  mutex.lock();
+  std::cout << std::endl << "====================="  << std::endl  << "barcodethread~~ ###########" << std::endl << "=====================" <<  std::endl;
+  mutex.unlock();
+  
   fc->detectCodes(img);
 
 
@@ -97,7 +102,9 @@ void Grabber::barcodethread(cv::Mat img) {
   } 
 
   runningTasks--;
+  std::cout << std::endl << "====================="  << std::endl  << "barcodethread --------" << std::endl << "=====================" <<  std::endl;
   mutex.unlock();
+
 
 }
 
