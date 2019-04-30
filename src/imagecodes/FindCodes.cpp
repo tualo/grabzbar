@@ -1,10 +1,5 @@
 #include "FindCodes.h"
 
-boost::format quicksvfmt("call quicksv('%s','%s','%s','%s','%s', '%s','%s','%s','%s','%s') ");
-
-boost::format set_camera_images_fmt("insert into camera_images (id,inserttime,kunde,state) values ('%s',now(),'%s','%s');  ");
-boost::format set_camera_imagescodes_fmt("insert into camera_imagescodes (id,code) values ('%s','%s') on duplicate key update id=values(id)");
-
 
 FindCodes::FindCodes():
   startSubtractMean(25),
@@ -129,7 +124,7 @@ void FindCodes::detectByThreshold(cv::Mat image,int thres) {
     mutex.unlock();
     cv::threshold(useimage,gray,thres,255, CV_THRESH_BINARY );
     findCodeInImage(gray);
-    
+
     gray.release();
     useimage.release();
 }
