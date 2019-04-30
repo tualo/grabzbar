@@ -413,11 +413,17 @@ std::string Grabber::getCustomer(){
 
 std::string Grabber::getFileName(std::string customer){
 
+  std::cout << "getFileName a" << std::endl;
   struct timeval ts;
+  std::cout << "getFileName b" << std::endl;
   gettimeofday(&ts,NULL);
-  std::string ext = str_extension;
+  std::cout << "getFileName c" << std::endl;
+  std::string ext = ".jpg";//str_extension;
+  std::cout << "getFileName d" << std::endl;
   std::string machine = "M00";
+  std::cout << "getFileName e" << std::endl;
   boost::format fmt = boost::format("%s%sN%012d.%06d.%s.%s") % getStoreImagePath() % customer % ts.tv_sec % ts.tv_usec % machine % ext;
+  std::cout << "getFileName f" << std::endl;
   return fmt.str();
 }
 
