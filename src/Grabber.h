@@ -22,13 +22,19 @@
 #include <iostream>
 
 
-#include "../mjpeg/mjpeg_server.hpp"
+//#include "../mjpeg/mjpeg_server.hpp"
 
 
 #include "../../ocrs/new/ocr_ext.h"
 #include "../../ocrs/new/ImageRecognizeEx.h"
 #include "../../ocrs/new/glob_posix.h"
 
+#include "./imagecodes/FindCodes.h"
+
+
+
+boost::format set_camera_images_fmt("insert into camera_images (id,inserttime,kunde,state) values ('%s',now(),'%s','%s');  ");
+boost::format set_camera_imagescodes_fmt("insert into camera_imagescodes (id,code) values ('%s','%s') on duplicate key update id=values(id)");
 
 
 using namespace Pylon;
@@ -44,6 +50,8 @@ public:
   void run();
   void beep();
   void setStoreImagePath(std::string value);
+  void setExtenstion(std::string value);
+  
   std::string getStoreImagePath();
   void setResultImagePath(std::string value);
   std::string getResultImagePath();
@@ -104,10 +112,14 @@ private:
   void run_streamer();
   void run_capture();
   std::string getFileName(std::string customer);
+  std::dtring Grabber::getCustomer();
   void ocrthread(cv::Mat img);
+  void barcodethread(cv::Mat img);
   void startocr(cv::Mat img);
 
 
+
+  std::string str_extension;
 
   std::string str_machine;
   std::string str_db_host;

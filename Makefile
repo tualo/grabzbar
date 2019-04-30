@@ -50,7 +50,8 @@ endif
 all				: $(NAME)
 
 $(NAME)			: $(NAME).o
-	$(LD) $(LDFLAGS) -v -o $@ RegionOfInterest.o ExtractAddress.o glob_posix.o ImageRecognizeEx.o ocr_ext.o server.o request_parser.o request_handler.o reply.o mjpeg_server.o mime_types.o connection.o Grabber.o grabzbar.o $(LDLIBS)
+	$(LD) $(LDFLAGS) -v -o $@ RegionOfInterest.o ExtractAddress.o glob_posix.o ImageRecognizeEx.o ocr_ext.o Barcode.o FindCodes.o Grabber.o grabzbar.o $(LDLIBS)
+#	$(LD) $(LDFLAGS) -v -o $@ RegionOfInterest.o ExtractAddress.o glob_posix.o ImageRecognizeEx.o ocr_ext.o server.o request_parser.o request_handler.o reply.o mjpeg_server.o mime_types.o connection.o Grabber.o grabzbar.o $(LDLIBS)
 
 SOURCES := $(shell find . -name '*.cpp')
 HEADERS := $(shell find . -name '*.h')
@@ -58,17 +59,21 @@ HEADERS := $(shell find . -name '*.h')
 
 
 $(NAME).o: $(SOURCES) $(HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./mjpeg/server.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./mjpeg/request_parser.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./mjpeg/request_handler.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./mjpeg/reply.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./mjpeg/mjpeg_server.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./mjpeg/mime_types.cpp
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./mjpeg/connection.cpp
+#	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./mjpeg/server.cpp
+#	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./mjpeg/request_parser.cpp
+#	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./mjpeg/request_handler.cpp
+#	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./mjpeg/reply.cpp
+#	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./mjpeg/mjpeg_server.cpp
+#	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./mjpeg/mime_types.cpp
+#	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./mjpeg/connection.cpp
 
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ../ocrs/new/RegionOfInterest.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ../ocrs/new/glob_posix.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ../ocrs/new/ExtractAddress.cpp
+
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./src/imagecodes/Barcode.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./src/imagecodes/FindCodes.cpp
+
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ../ocrs/new/ImageRecognizeEx.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ../ocrs/new/ocr_ext.cpp
 

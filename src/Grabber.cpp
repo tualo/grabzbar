@@ -21,6 +21,7 @@ Grabber::Grabber():
   f_meanfactor=1.0;
   b_bc_clahe=false;
   b_forceFPCode=false;
+  str_extension="jpg";
 
   avg_start=-1;
   avg_stop = -1;
@@ -52,6 +53,52 @@ void Grabber::dbConnect(){
     mysql_close(con);
     exit(1);
   }
+}
+
+void Grabber::barcodethread(cv::Mat img) {
+
+  std::string customer = "";
+  std::string state="";
+  mutex.lock();
+  customer = getCustomer();
+  state = getResultState();
+  runningTasks++;
+  mutex.unlock();
+
+  std::string fn = getFileName(customer);
+  std::string line;
+  std::string basename = (boost::filesystem::path( fn ).filename()).string();
+
+  
+  
+  FindCodes *fc = new FindCodes();
+  fc->detectCodes(img);
+
+
+  mutex.lock();
+  cv::imwrite((fn).c_str(),img);
+  
+  std::string sql = boost::str(set_camera_images_fmt % basename % customer % state );
+  std::cout << std::endl << "====================="  << std::endl  << sql << std::endl << "=====================" <<  std::endl;
+  if (mysql_query(con, sql.c_str())){
+      fprintf(stderr, "%s\n", mysql_error(con));
+      exit(1);
+  }
+
+  std::list<Barcode*> barcodes = fc->codes();
+  std::list<Barcode*>::const_iterator it;
+  for (it = barcodes.begin(); it != barcodes.end(); ++it){
+      std::string sql = boost::str(set_camera_imagescodes_fmt % basename % ((Barcode*)*it)->code() );
+      std::cout << std::endl << "====================="  << std::endl  << sql << std::endl << "=====================" <<  std::endl;
+      if (mysql_query(con, sql.c_str())){
+          fprintf(stderr, "%s\n", mysql_error(con));
+          exit(1);
+      }
+  } 
+
+  runningTasks--;
+  mutex.unlock();
+
 }
 
 void Grabber::ocrthread(cv::Mat img) {
@@ -314,6 +361,10 @@ std::string Grabber::getStoreImagePath(){
   return storePath;
 }
 
+void Grabber::setExtenstion(std::string value){
+  str_extension = value;
+}
+
 void Grabber::setResultImagePath(std::string value){
   resultPath= value;
 }
@@ -336,19 +387,26 @@ std::string Grabber::getResultState(){
   return state;
 }
 
-std::string Grabber::getFileName(){
+std::string Grabber::getCustomer(){
   std::string customer="";
   std::string line;
   std::ifstream myfile ("/opt/grab/customer.txt",std::ifstream::in);
   if (myfile.is_open()){
     while ( getline (myfile,line) ){
+      std::replace( line.begin(), line.end(), '|', 'Z');
       customer = line;
     }
     myfile.close();
   }
+}
+
+std::string Grabber::getFileName(std::string customer){
+
   struct timeval ts;
   gettimeofday(&ts,NULL);
-  boost::format fmt = boost::format("%s%sN%012d.%06d.tiff") % getStoreImagePath() % customer % ts.tv_sec % ts.tv_usec;
+  std:string ext = str_extension;
+  std:string machine = "M00";
+  boost::format fmt = boost::format("%s%sN%012d.%06d.%s.%s") % getStoreImagePath() % customer % ts.tv_sec % ts.tv_usec % machine % ext;
   return fmt.str();
 }
 
@@ -362,12 +420,14 @@ void Grabber::run(){
 }
 
 void Grabber::startocr(cv::Mat img){
-  //std::cout << "startocr rows" << img.rows << " can start " <<  canStartTask() << std::endl;
   if (canStartTask()){
-    boost::thread* thr = new boost::thread(&Grabber::ocrthread, this , img);
+    if (b_noocr==false){
+      boost::thread* thr = new boost::thread(&Grabber::barcodethread, this , img);
+    }else{
+      boost::thread* thr = new boost::thread(&Grabber::ocrthread, this , img);
+    }
   }else{
-    //std::cout << "saving rows" << img.rows << std::endl;
-    cv::imwrite((getFileName()).c_str(),img);
+    cv::imwrite((getFileName(getCustomer())).c_str(),img);
   }
 }
 
@@ -642,6 +702,11 @@ void Grabber::run_capture(){
 
                 //boost::thread mythread(barcode,result);
                 startocr(result);
+
+                mutex.lock();
+                  result.release();
+                mutex.unlock();
+
                 inimage=false;
               }
 
@@ -713,6 +778,7 @@ void Grabber::run_capture(){
 }
 
 void Grabber::run_streamer(){
+  /*
     using namespace http::server;
     // Run server in background thread.
     std::size_t num_threads = 2;
@@ -766,4 +832,5 @@ void Grabber::run_streamer(){
       //use boost sleep so that our loop doesn't go out of control.
       boost::this_thread::sleep(boost::posix_time::milliseconds(ms)); //30 FPS
     }
+    */
 }

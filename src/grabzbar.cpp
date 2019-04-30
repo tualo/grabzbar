@@ -117,6 +117,7 @@ int main(int argc, char* argv[])
     args::ValueFlag<std::string> db_user(parser, "user", "The database server username", {'u',"user"});
     args::ValueFlag<std::string> db_pass(parser, "password", "The database server password", {'x',"password"});
     args::ValueFlag<std::string> db_encoding(parser, "encoding", "The database server encoding", {'e',"encoding"});
+    args::ValueFlag<std::string> extension(parser, "extension", "the file extension", {'e',"extension"});
 
 
     args::ValueFlag<int> pixel_cm_x(parser, "cm_x", "Pixel per CM X (default 73)", {"cmx"});
@@ -194,6 +195,7 @@ int main(int argc, char* argv[])
     Grabber *grabber=new Grabber();
     grabber->setResultImagePath(std_str_resultpath);
     grabber->setStoreImagePath(std_str_storepath);
+    if (extension){ grabber->setExtenstion(args::get(extension)); }
     
     grabber->configOCR(
       debug==1,
@@ -211,7 +213,9 @@ int main(int argc, char* argv[])
       noocr==1,
       setrls==1
     );
+
     grabber->configCamera(
+
       int_exposure,
       int_lineheight,
       int_maxheight,
@@ -228,12 +232,14 @@ int main(int argc, char* argv[])
     }
     
     grabber->configConnection(
+
       std_str_machine,
       str_db_host,
       str_db_user,
       str_db_name,
       str_db_password,
       str_db_encoding
+      
     );
     grabber->dbConnect();
 
