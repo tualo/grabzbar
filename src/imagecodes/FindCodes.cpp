@@ -84,6 +84,8 @@ void FindCodes::detectCodes(cv::Mat image){
         ((boost::thread*)*it)->join();
     }
 
+    delete meanLoopThread;
+    
     debugTime("stop detectCodes");
     //debugCodes();
 }
@@ -127,8 +129,8 @@ void FindCodes::detectByThreshold(cv::Mat image,int thres) {
     cv::threshold(useimage,gray,thres,255, CV_THRESH_BINARY );
     findCodeInImage(gray);
 
-    gray.release();
-    useimage.release();
+//    gray.release();
+//    useimage.release();
 }
 
 void FindCodes::detectByAdaptiveThreshold(cv::Mat image,int blocksize, int subtractmean) {
@@ -153,8 +155,8 @@ void FindCodes::detectByAdaptiveThreshold(cv::Mat image,int blocksize, int subtr
         );
         findCodeInImage(gray);
 
-        gray.release();
-        useimage.release();
+//        gray.release();
+//        useimage.release();
 
 }
 
@@ -166,8 +168,8 @@ void FindCodes::findBlured(cv::Mat image){
     cv::GaussianBlur(useimage,gray,cv::Size(3,3),2,2);
     findCodeInImage(gray);
 
-    gray.release();
-    useimage.release();
+//    gray.release();
+//    useimage.release();
 
 }
 
