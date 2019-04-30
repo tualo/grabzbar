@@ -417,6 +417,7 @@ std::string Grabber::getCustomer(){
     }
     myfile.close();
   }
+  return customer;
 }
 
 std::string Grabber::getFileName(std::string customer){
