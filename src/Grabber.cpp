@@ -1,6 +1,6 @@
 #include "Grabber.h"
 
-boost::format quicksvfmt("call quicksv('%s','%s','%s','%s','%s', '%s','%s','%s','%s','%s') ");
+boost::format quicksvfmt_grapper("call quicksv('%s','%s','%s','%s','%s', '%s','%s','%s','%s','%s') ");
 
 boost::format set_camera_images_fmt_grapper("insert into camera_images (id,inserttime,kunde,state) values ('%s',now(),'%s','%s');  ");
 boost::format set_camera_imagescodes_fmt_grapper("insert into camera_imagescodes (id,code) values ('%s','%s') on duplicate key update id=values(id)");
@@ -192,7 +192,7 @@ if (b_noocr==false){
   }else{
     std::cout << "No ZipCode " << std::endl;
   }
-  std::string sql = boost::str(quicksvfmt % ir->getBarcode() % ea->getZipCode() % ea->getTown() % ea->getStreetName() % ea->getHouseNumber() % ea->getSortRow() % ea->getSortBox() % ea->getString() % ir->getKundennummer() % ir->getKostenstelle());
+  std::string sql = boost::str(quicksvfmt_grapper % ir->getBarcode() % ea->getZipCode() % ea->getTown() % ea->getStreetName() % ea->getHouseNumber() % ea->getSortRow() % ea->getSortBox() % ea->getString() % ir->getKundennummer() % ir->getKostenstelle());
   mutex.unlock();
 
   if (mysql_query(con, sql.c_str())){
