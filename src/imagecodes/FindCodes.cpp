@@ -40,10 +40,9 @@ void FindCodes::detect(std::string filename){
     fname= filename.c_str();
     cv::Mat img = imread(fname, cv::IMREAD_COLOR );
     
-    cv::Mat gray;
+
     cv::Mat useimage;
     cv::cvtColor(img, useimage, CV_BGR2GRAY);
-
     detectCodes(useimage);
 
 }
@@ -55,7 +54,7 @@ void FindCodes::setDebugTiming(bool v){
 void FindCodes::detectCodes(cv::Mat image){
     std::list<boost::thread*> threadList;
 
-debugTime("start detectCodes");
+    debugTime("start detectCodes");
 
     boost::thread* meanLoopThread = new boost::thread(&FindCodes::findBlured, this, image);  
     threadList.push_back(meanLoopThread);
@@ -84,6 +83,8 @@ debugTime("start detectCodes");
         ((boost::thread*)*it)->join();
     }
 
+    delete meanLoopThread;
+    
     debugTime("stop detectCodes");
     //debugCodes();
 }
@@ -119,14 +120,16 @@ std::list<Barcode*> FindCodes::codes(){
 
 void FindCodes::detectByThreshold(cv::Mat image,int thres) {
     cv::Mat gray;
+
     mutex.lock();
     cv::Mat useimage = image.clone();
     mutex.unlock();
+
     cv::threshold(useimage,gray,thres,255, CV_THRESH_BINARY );
     findCodeInImage(gray);
 
-    gray.release();
-    useimage.release();
+//    gray.release();
+//    useimage.release();
 }
 
 void FindCodes::detectByAdaptiveThreshold(cv::Mat image,int blocksize, int subtractmean) {
@@ -151,8 +154,8 @@ void FindCodes::detectByAdaptiveThreshold(cv::Mat image,int blocksize, int subtr
         );
         findCodeInImage(gray);
 
-        gray.release();
-        useimage.release();
+//        gray.release();
+//        useimage.release();
 
 }
 
@@ -164,8 +167,8 @@ void FindCodes::findBlured(cv::Mat image){
     cv::GaussianBlur(useimage,gray,cv::Size(3,3),2,2);
     findCodeInImage(gray);
 
-    gray.release();
-    useimage.release();
+//    gray.release();
+//    useimage.release();
 
 }
 
