@@ -69,6 +69,8 @@ void Grabber::barcodethread(cv::Mat img) {
   std::cout << "barcodethread b" << std::endl;
   runningTasks++;
   std::cout << "barcodethread c" << std::endl;
+  std::cout << "barcodethread c" << customer << std::endl;
+  
   std::string fn = getFileName(customer);
   std::cout << "barcodethread d" << std::endl;
   mutex.unlock();
