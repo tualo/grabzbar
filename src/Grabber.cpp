@@ -64,9 +64,9 @@ void Grabber::barcodethread(cv::Mat img) {
   customer = getCustomer();
   state = getResultState();
   runningTasks++;
+  std::string fn = getFileName(customer);
   mutex.unlock();
 
-  std::string fn = "/tmp/test.jpg"; //getFileName(customer);
   std::string line;
   std::string basename = (boost::filesystem::path( fn ).filename()).string();
 
