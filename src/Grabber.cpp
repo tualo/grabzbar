@@ -422,10 +422,11 @@ void Grabber::run(){
 
 void Grabber::startocr(cv::Mat img){
   if (canStartTask()){
-    if (b_noocr==false){
+//    if (b_noocr==false){
       boost::thread* thr = new boost::thread(&Grabber::barcodethread, this , img);
-    }else{
-      boost::thread* thr = new boost::thread(&Grabber::ocrthread, this , img);
+//    }else{
+//      boost::thread* thr = new boost::thread(&Grabber::ocrthread, this , img);
+//
     }
   }else{
     cv::imwrite((getFileName(getCustomer())).c_str(),img);
