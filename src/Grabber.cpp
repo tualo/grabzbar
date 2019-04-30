@@ -66,7 +66,7 @@ void Grabber::barcodethread(cv::Mat img) {
   runningTasks++;
   mutex.unlock();
 
-  std::string fn = getFileName(customer);
+  std::string fn = "/tmp/test.jpg"; //getFileName(customer);
   std::string line;
   std::string basename = (boost::filesystem::path( fn ).filename()).string();
 
@@ -81,8 +81,11 @@ void Grabber::barcodethread(cv::Mat img) {
 
 
   mutex.lock();
+
+
   cv::imwrite((fn).c_str(),img);
   
+
   std::string sql = boost::str(set_camera_images_fmt_grapper % basename % customer % state );
   std::cout << std::endl << "====================="  << std::endl  << sql << std::endl << "=====================" <<  std::endl;
   if (mysql_query(con, sql.c_str())){
