@@ -110,6 +110,7 @@ void Grabber::ocrthread(cv::Mat img) {
   runningTasks++;
   mutex.unlock();
 
+
 /*
   struct timeval tsx;
   gettimeofday(&tsx,NULL);
