@@ -66,7 +66,7 @@ void Grabber::barcodethread(cv::Mat img, std::string fileName) {
   runningTasks++;
   
   std::string fn = fileName;
-  
+
   mutex.unlock();
 
   std::string line;
@@ -427,7 +427,7 @@ void Grabber::run(){
 }
 
 void Grabber::startocr(cv::Mat img){
-  std::string fn = (getFileName(getCustomer());
+  std::string fn =  getFileName(getCustomer());
 
   std::cout << "Grabber::startocr  " << fn << std::endl;
   if (canStartTask()){
