@@ -79,6 +79,7 @@ void Grabber::barcodethread(cv::Mat img, std::string fileName) {
   mutex.lock();
 
   cv::imwrite((fn).c_str(),img);
+  img.release();
   std::string sql = boost::str(set_camera_images_fmt_grapper % basename % customer % state );
   if (mysql_query(con, sql.c_str())){
       fprintf(stderr, "%s\n", mysql_error(con));
@@ -428,16 +429,17 @@ void Grabber::run(){
 
 void Grabber::startocr(cv::Mat img){
   std::string fn =  getFileName(getCustomer());
-
+  cv::Mat useImage = img.clone();
   std::cout << "Grabber::startocr  " << fn << std::endl;
   if (canStartTask()){
     if (b_noocr==false){
-      boost::thread* thr = new boost::thread(&Grabber::barcodethread, this , img, fn);
+      boost::thread* thr = new boost::thread(&Grabber::barcodethread, this , useImage, fn);
     }else{
-      boost::thread* thr = new boost::thread(&Grabber::ocrthread, this , img);
+      boost::thread* thr = new boost::thread(&Grabber::ocrthread, this , useImage);
     }
   }else{
-    cv::imwrite(fn.c_str(),img);
+    cv::imwrite(fn.c_str(),useImage);
+    useImage.release();
   }
 }
 
