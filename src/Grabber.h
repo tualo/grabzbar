@@ -113,7 +113,7 @@ private:
   std::string getFileName(std::string customer);
   std::string getCustomer();
   void ocrthread(cv::Mat img);
-  void barcodethread(cv::Mat img);
+  void barcodethread(cv::Mat img, std::string fileName);
   void startocr(cv::Mat img);
 
 

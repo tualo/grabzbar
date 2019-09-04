@@ -55,7 +55,7 @@ void Grabber::dbConnect(){
   }
 }
 
-void Grabber::barcodethread(cv::Mat img) {
+void Grabber::barcodethread(cv::Mat img, std::string fileName) {
 
   std::string customer = "";
   std::string state="";
@@ -65,22 +65,20 @@ void Grabber::barcodethread(cv::Mat img) {
   state = getResultState();
   runningTasks++;
   
-  std::string fn = getFileName(customer);
+  std::string fn = fileName;
+  
   mutex.unlock();
 
   std::string line;
   std::string basename = (boost::filesystem::path( fn ).filename()).string();
-
-  
-  
   FindCodes *fc = new FindCodes();
-
-  
   fc->detectCodes(img);
-  mutex.lock();
-  cv::imwrite((fn).c_str(),img);
-  
 
+
+
+  mutex.lock();
+
+  cv::imwrite((fn).c_str(),img);
   std::string sql = boost::str(set_camera_images_fmt_grapper % basename % customer % state );
   if (mysql_query(con, sql.c_str())){
       fprintf(stderr, "%s\n", mysql_error(con));
@@ -183,24 +181,27 @@ void Grabber::ocrthread(cv::Mat img) {
   ir->correctSize();
   ir->largestContour(false);
 
-ExtractAddress* ea;
-if (b_noocr==false){
-  ea = ir->texts();
+  ExtractAddress* ea;
+
+  if (b_noocr==false){
+    ea = ir->texts();
 
 
-  mutex.lock();
-  if (ea->foundAddress()){
-    std::cout << "ZipCode " << ea->getZipCode() << std::endl;
-  }else{
-    std::cout << "No ZipCode " << std::endl;
+    mutex.lock();
+    if (ea->foundAddress()){
+      std::cout << "ZipCode " << ea->getZipCode() << std::endl;
+    }else{
+      std::cout << "No ZipCode " << std::endl;
+    }
+    std::string sql = boost::str(quicksvfmt_grapper % ir->getBarcode() % ea->getZipCode() % ea->getTown() % ea->getStreetName() % ea->getHouseNumber() % ea->getSortRow() % ea->getSortBox() % ea->getString() % ir->getKundennummer() % ir->getKostenstelle());
+    mutex.unlock();
+
+    if (mysql_query(con, sql.c_str())){
+      fprintf(stderr, "%s\n", mysql_error(con));
+    }
+
   }
-  std::string sql = boost::str(quicksvfmt_grapper % ir->getBarcode() % ea->getZipCode() % ea->getTown() % ea->getStreetName() % ea->getHouseNumber() % ea->getSortRow() % ea->getSortBox() % ea->getString() % ir->getKundennummer() % ir->getKostenstelle());
-  mutex.unlock();
 
-  if (mysql_query(con, sql.c_str())){
-    fprintf(stderr, "%s\n", mysql_error(con));
-  }
-}
   cv::Mat im = ir->getResultImage();
   std::string prefix = "";
   std::vector<int> params;
@@ -321,20 +322,20 @@ if (b_noocr==false){
 
 //  mysql_close(con);
   mutex.lock();
+  if (b_noocr==false){
+    double _since_start = ( ((double)cv::getTickCount() - _start_time)/cv::getTickFrequency() );
+    std::cout << "#########################################" << std::endl;
+    std::cout << "code: " << ir->getBarcode() << std::endl;
+    std::cout << "zipcode: " << ea->getZipCode() << std::endl;
+    std::cout << "town: " << ea->getTown() << std::endl;
+    std::cout << "street: " << ea->getStreetName() << std::endl;
+    std::cout << "housenumber: " << ea->getHouseNumber() << std::endl;
+    std::cout << "sortiergang: " << ea->getSortRow() << std::endl;
+    std::cout << "sortierfach: " << ea->getSortBox() << std::endl;
+    std::cout << "zeit: " << _since_start << "s" << std::endl;
+    std::cout << "#########################################" << std::endl;
+  }
 
-if (b_noocr==false){
-  double _since_start = ( ((double)cv::getTickCount() - _start_time)/cv::getTickFrequency() );
-  std::cout << "#########################################" << std::endl;
-  std::cout << "code: " << ir->getBarcode() << std::endl;
-  std::cout << "zipcode: " << ea->getZipCode() << std::endl;
-  std::cout << "town: " << ea->getTown() << std::endl;
-  std::cout << "street: " << ea->getStreetName() << std::endl;
-  std::cout << "housenumber: " << ea->getHouseNumber() << std::endl;
-  std::cout << "sortiergang: " << ea->getSortRow() << std::endl;
-  std::cout << "sortierfach: " << ea->getSortBox() << std::endl;
-  std::cout << "zeit: " << _since_start << "s" << std::endl;
-  std::cout << "#########################################" << std::endl;
-}
   /*
   int system_result;
   system_result = system( "curl -u admin:password \"http://192.168.192.244/io.cgi?DOA1=3\"" );
@@ -426,15 +427,17 @@ void Grabber::run(){
 }
 
 void Grabber::startocr(cv::Mat img){
+  std::string fn = (getFileName(getCustomer());
+
+  std::cout << "Grabber::startocr  " << fn << std::endl;
   if (canStartTask()){
-//    if (b_noocr==false){
-      boost::thread* thr = new boost::thread(&Grabber::barcodethread, this , img);
-//    }else{
-//      boost::thread* thr = new boost::thread(&Grabber::ocrthread, this , img);
-//
-//    }
+    if (b_noocr==false){
+      boost::thread* thr = new boost::thread(&Grabber::barcodethread, this , img, fn);
+    }else{
+      boost::thread* thr = new boost::thread(&Grabber::ocrthread, this , img);
+    }
   }else{
-    cv::imwrite((getFileName(getCustomer())).c_str(),img);
+    cv::imwrite(fn.c_str(),img);
   }
 }
 
